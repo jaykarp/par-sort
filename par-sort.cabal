@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 367a1c33c16dac35bbcc2d23224197a78091733b341fe3fb0821c769340fe380
+-- hash: b1ba5cf03cdc9c6a7cdb6636526186df165be3ca367a2e933601b27ea53d9c6e
 
 name:           par-sort
 version:        0.1.0.0
@@ -34,6 +34,8 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , bytestring
+    , vector
   default-language: Haskell2010
 
 executable par-sort-exe
@@ -45,7 +47,9 @@ executable par-sort-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , bytestring
     , par-sort
+    , vector
   default-language: Haskell2010
 
 test-suite par-sort-test
