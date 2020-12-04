@@ -10,26 +10,34 @@ import System.IO (withFile, IOMode(ReadMode), hIsEOF)
 import qualified Data.ByteString as B
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as M
-import Data.Vector ((!))
+import Data.Vector (MVector, (!))
+import Control.Monad.ST (ST)
 
 mergeSort :: Ord a => V.Vector a -> V.Vector a
-mergeSort v = merge (runs v) (V.length v)
+mergeSort = merge . runs
 
-runs :: Ord a => V.Vector a -> [V.Vector a] 
-runs = go 1 0
+runs :: Ord a => V.Vector a -> V.Vector (V.Vector a)
+runs x = V.create $ do
+    v <- M.new (V.length x)
+    go 1 0 0 v
     where
-        go i j v 
-            | i < V.length v = if v!(i-1) > v!i then V.slice j (i-j) v : go (i + 1) i v else go (i+1) j v
-            | otherwise = [V.slice j (i-j) v]
+        go i j k v
+            | i < V.length x = do
+                if x!(i-1) > x!i then do
+                    M.write v k (V.slice j (i-j) x)
+                    go (i+1) i (k+1) v
+                else go (i+1) j k v
+            | otherwise = do
+                M.write v k (V.slice j (i-j) x)
+                return $ M.slice 0 k v
 
-merge :: Ord a => [V.Vector a] -> Int -> V.Vector a
-merge [a,b] _ = merge2 a b
-merge [v] _ = v
-merge [] _ = V.empty
-merge l len = merge [merge a nlen, merge b (len - nlen)] nlen
-    where 
-        (a, b) = splitAt nlen l
-        nlen   = len `div` 2
+merge :: Ord a => V.Vector (V.Vector a) -> V.Vector a
+merge v
+    | V.length v == 0 = V.empty
+    | V.length v == 1 = v!0
+    | otherwise = merge2 (merge a) (merge b) 
+    where
+        (a, b) = V.splitAt (V.length v `div` 2) v
 
 merge2 :: Ord a => V.Vector a -> V.Vector a -> V.Vector a       
 merge2 a b = V.create $ do
