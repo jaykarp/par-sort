@@ -40,7 +40,6 @@ executables:
       - par-sort
       - bytestring
       - vector
-
 tests:
   par-sort-test:
     main: Spec.hs

@@ -1,5 +1,6 @@
 module Main where
 
+import System.CPUTime
 import Lib ( readLines,
              mergeSort,
            )
@@ -10,5 +11,8 @@ import Data.Vector ((!))
 main :: IO ()
 main = do 
    v <- readLines "res/shuffledwords.txt"
---    let v = V.reverse $ V.fromList [0..1000000]
+   start <- getCPUTime
    print $ mergeSort v!0
+   end <- getCPUTime
+   let diff = (fromIntegral (end - start)) / (10^12)
+   print diff
