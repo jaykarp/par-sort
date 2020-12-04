@@ -1,5 +1,6 @@
 module Lib
     ( readLines,
+      mergeSort,
       runs,
       merge,
       merge2
@@ -11,6 +12,9 @@ import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as M
 import Data.Vector ((!))
 
+mergeSort :: Ord a => V.Vector a -> V.Vector a
+mergeSort = merge . runs
+
 runs :: Ord a => V.Vector a -> [V.Vector a] 
 runs = go 1 0
     where
@@ -19,9 +23,11 @@ runs = go 1 0
             | otherwise = [V.slice j (i-j) v]
 
 merge :: Ord a => [V.Vector a] -> V.Vector a
-merge (v1:v2:vs) = merge $ merge2 v1 v2 : vs
+merge [a,b] = merge2 a b
 merge [v] = v
 merge [] = V.empty
+merge l = merge [merge a, merge b]
+    where (a, b) = splitAt (length l `div` 2) l
 
 merge2 :: Ord a => V.Vector a -> V.Vector a -> V.Vector a       
 merge2 a b = V.create $ do
