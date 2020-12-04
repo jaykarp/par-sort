@@ -1,6 +1,6 @@
 module Main where
 
-import System.CPUTime
+import Data.Time.Clock
 import Lib ( readLines,
              mergeSort,
            )
@@ -11,8 +11,7 @@ import Data.Vector ((!))
 main :: IO ()
 main = do 
    v <- readLines "res/shuffledwords.txt"
-   start <- getCPUTime
+   start <- getCurrentTime
    print $ mergeSort v!0
-   end <- getCPUTime
-   let diff = (fromIntegral (end - start)) / (10^12)
-   print diff
+   end <- getCurrentTime
+   print $ diffUTCTime end start
