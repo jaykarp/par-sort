@@ -1,7 +1,8 @@
 module Lib
     ( readLines,
       runs,
-      merge2,
+      merge,
+      merge2
     ) where
 
 import System.IO (withFile, IOMode(ReadMode), hIsEOF)
@@ -16,6 +17,11 @@ runs = go 1 0
         go i j v 
             | i < V.length v = if v!(i-1) > v!i then V.slice j (i-j) v : go (i + 1) i v else go (i+1) j v
             | otherwise = [V.slice j (i-j) v]
+
+merge :: Ord a => [V.Vector a] -> V.Vector a
+merge (v1:v2:vs) = merge $ merge2 v1 v2 : vs
+merge [v] = v
+merge [] = V.empty
 
 merge2 :: Ord a => V.Vector a -> V.Vector a -> V.Vector a       
 merge2 a b = V.create $ do
