@@ -3,7 +3,7 @@ module Lib
       mergeSort,
       runs,
       merge,
-      merge2
+      merge2,
     ) where
 
 import System.IO (withFile, IOMode(ReadMode), hIsEOF)
@@ -13,7 +13,7 @@ import qualified Data.Vector.Mutable as M
 import Data.Vector ((!))
 
 mergeSort :: Ord a => V.Vector a -> V.Vector a
-mergeSort = merge . runs
+mergeSort v = merge (runs v) (V.length v)
 
 runs :: Ord a => V.Vector a -> [V.Vector a] 
 runs = go 1 0
@@ -22,12 +22,14 @@ runs = go 1 0
             | i < V.length v = if v!(i-1) > v!i then V.slice j (i-j) v : go (i + 1) i v else go (i+1) j v
             | otherwise = [V.slice j (i-j) v]
 
-merge :: Ord a => [V.Vector a] -> V.Vector a
-merge [a,b] = merge2 a b
-merge [v] = v
-merge [] = V.empty
-merge l = merge [merge a, merge b]
-    where (a, b) = splitAt (length l `div` 2) l
+merge :: Ord a => [V.Vector a] -> Int -> V.Vector a
+merge [a,b] _ = merge2 a b
+merge [v] _ = v
+merge [] _ = V.empty
+merge l len = merge [merge a nlen, merge b (len - nlen)] nlen
+    where 
+        (a, b) = splitAt nlen l
+        nlen   = len `div` 2
 
 merge2 :: Ord a => V.Vector a -> V.Vector a -> V.Vector a       
 merge2 a b = V.create $ do
