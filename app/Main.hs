@@ -11,12 +11,12 @@ import Data.Vector ((!))
 
 main :: IO ()
 main = do 
-   v <- readLines "res/shuffledwords.txt"
+   v <- readLines "res/shuffledwords2.txt"
    start <- getCurrentTime
-   print $ mergeSort v
+   print $ mergeSort v!0
    end <- getCurrentTime
-   start2 <- getCurrentTime
-   print $ sort $ V.toList v 
-   end2 <- getCurrentTime
+--    start2 <- getCurrentTime
+--    print $ sort $ V.toList v 
+--    end2 <- getCurrentTime
    print $ diffUTCTime end start
-   print $ diffUTCTime end2 start2
+--    print $ diffUTCTime end2 start2

@@ -42,12 +42,27 @@ runs x = V.create $ do
                 runs' (i+1) x (k+1) o
 
 merge :: Ord a => V.Vector (V.Vector a) -> V.Vector a
-merge v
-    | V.length v == 0 = V.empty
-    | V.length v == 1 = v!0
-    | otherwise = merge2 (merge a) (merge b) 
+merge v = (!0) $ V.create $ do
+    o <- V.thaw v 
+    mergeAll (V.length v) o
+    return $ M.slice 0 1 o
     where
-        (a, b) = V.splitAt (V.length v `div` 2) v
+        mergeAll k o 
+            | k == 1 = return ()  
+            | otherwise = do
+                k' <- mergePairs 0 k o 
+                mergeAll k' o
+        mergePairs i k o
+            | i < k - 1 = do
+                oi <- M.read o i 
+                oip1 <- M.read o (i+1)
+                M.write o (i `div` 2) (merge2 oi oip1)
+                mergePairs (i+2) k o
+            | i == k - 1 = do
+                oi <- M.read o i
+                M.write o (i `div` 2) oi
+                return $ k `div` 2 + 1 
+            | otherwise = return $ k `div` 2
 
 merge2 :: Ord a => V.Vector a -> V.Vector a -> V.Vector a       
 merge2 a b = V.create $ do
