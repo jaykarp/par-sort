@@ -18,18 +18,28 @@ mergeSort = merge . runs
 
 runs :: Ord a => V.Vector a -> V.Vector (V.Vector a)
 runs x = V.create $ do
-    v <- M.new (V.length x)
-    go 1 0 0 v
+    o <- M.new (V.length x)
+    runs' 1 x 0 o  
     where
-        go i j k v
-            | i < V.length x = do
-                if x!(i-1) > x!i then do
-                    M.write v k (V.slice j (i-j) x)
-                    go (i+1) i (k+1) v
-                else go (i+1) j k v
-            | otherwise = do
-                M.write v k (V.slice j (i-j) x)
-                return $ M.slice 0 k v
+        runs' i x k o
+            | i < V.length x = 
+                if x!(i-1) <= x!i then 
+                    asc (i-1) i k o
+                else 
+                    dsc (i-1) i k o
+            | otherwise = return $ M.slice 0 k o 
+        asc s i k o = 
+            if i < V.length x && x!(i-1) <= x!i then 
+                asc s (i+1) k o
+            else do
+                M.write o k (V.slice s (i-s) x)
+                runs' (i+1) x (k+1) o
+        dsc s i k o = 
+            if i < V.length x && x!(i-1) > x!i then
+                dsc s (i+1) k o
+            else do
+                M.write o k (V.reverse $ V.slice s (i-s) x)
+                runs' (i+1) x (k+1) o
 
 merge :: Ord a => V.Vector (V.Vector a) -> V.Vector a
 merge v
