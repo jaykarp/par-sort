@@ -27,6 +27,7 @@ library:
   dependencies:
     - bytestring
     - vector
+    - deepseq
 
 executables:
   par-sort-exe:
@@ -41,6 +42,8 @@ executables:
       - bytestring
       - vector
       - time
+      - deepseq
+
 tests:
   par-sort-test:
     main: Spec.hs

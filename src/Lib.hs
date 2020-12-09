@@ -1,5 +1,6 @@
 module Lib
     ( readLines,
+      quickSort,
       mergeSort,
       runs,
       merge,
@@ -85,6 +86,34 @@ merge2 a b = V.create $ do
                     go i (j+1) v
                 | otherwise = return ()
 
+
+quickSort :: Ord a => V.Vector a -> V.Vector a
+quickSort v = V.create $ do
+    v' <- V.thaw v
+    quickSort' v' 0 (V.length v - 1)
+    return v'
+    where
+    quickSort' v low high 
+        | low < high = do
+            pi <- partition v low high
+            quickSort' v low (pi - 1)
+            quickSort' v (pi + 1) high
+        | otherwise = return ()
+    partition v low high = do
+        i <- go (low - 1) low 
+        M.swap v (i+1) high
+        return $ i + 1
+        where
+            go i j 
+                | j < high = do
+                    vj <- M.read v j
+                    pivot <- M.read v high
+                    if vj < pivot then do
+                        M.swap v (i+1) j
+                        go (i+1) (j+1)
+                    else
+                        go i (j+1)
+                | otherwise = return i 
 
 
 readLines :: String -> IO (V.Vector B.ByteString)
