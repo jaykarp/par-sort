@@ -5,6 +5,8 @@ module Lib
       runs,
       merge,
       merge2,
+      bitonicSort,
+      fillBitonic
     ) where
 
 import System.IO (withFile, IOMode(ReadMode), hIsEOF)
@@ -13,6 +15,49 @@ import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as M
 import Data.Vector (MVector, (!))
 import Control.Monad.ST (ST)
+import Control.Monad (when)
+
+bitonicSort :: Ord a => a -> V.Vector a -> V.Vector a
+bitonicSort = (bitonic .) . fillBitonic 
+
+fillBitonic :: a -> V.Vector a -> V.Vector a
+fillBitonic a v = V.create $ do
+    o <- V.thaw v
+    let l = V.length v
+    let n = 2 ^ ceiling (logBase 2 (fromIntegral l)) - l
+    o' <- M.grow o n 
+    p <- M.replicate n a
+    M.copy (M.slice l n o') p
+    return o'
+
+
+bitonic :: Ord a => V.Vector a -> V.Vector a 
+bitonic v = V.create $ do
+    o <- V.thaw v 
+    bitonicSort' o 0 (V.length v) True 
+    return o
+    where 
+        bitonicSort' o low cnt dir = 
+            when (cnt > 1) $ do 
+                let k = cnt `div` 2
+                bitonicSort' o low k True
+                bitonicSort' o (low + k) k False
+                bitonicMerge o low cnt dir
+        bitonicMerge o low cnt dir =
+            when (cnt > 1) $ do
+                let k = cnt `div` 2
+                loopSwap o low low k dir
+                bitonicMerge o low k dir
+                bitonicMerge o (low+k) k  dir
+        loopSwap o low i k dir = 
+            when (i < low + k) $ do
+                compareAndSwap o i (i+k) dir
+                loopSwap o low (i+1) k dir
+        compareAndSwap o i j dir = do
+            oi <- M.read o i
+            oj <- M.read o j
+            when (dir == (oi > oj)) $ M.swap o i j
+                
 
 mergeSort :: Ord a => V.Vector a -> V.Vector a
 mergeSort = merge . runs
