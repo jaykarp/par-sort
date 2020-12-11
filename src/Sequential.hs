@@ -6,8 +6,8 @@ import qualified Data.Vector.Mutable as M
 import Control.Monad (when)
 import Utils ( fillBitonic )
 
-bitonicSort :: Ord a => a -> V.Vector a -> V.Vector a
-bitonicSort = (bitonic .) . fillBitonic
+bitonicSeq :: Ord a => a -> V.Vector a -> V.Vector a
+bitonicSeq = (bitonic .) . fillBitonic
 
 bitonic :: Ord a => V.Vector a -> V.Vector a 
 bitonic v = V.create $ do
@@ -36,8 +36,8 @@ bitonic v = V.create $ do
             oj <- M.read o j
             when (dir == (oi > oj)) $ M.swap o i j
              
-mergeSort :: Ord a => V.Vector a -> V.Vector a
-mergeSort = merge . runs
+mergeSeq :: Ord a => V.Vector a -> V.Vector a
+mergeSeq = merge . runs
 
 runs :: Ord a => V.Vector a -> V.Vector (V.Vector a)
 runs x = V.create $ do
@@ -109,8 +109,8 @@ merge2 a b = V.create $ do
                 | otherwise = return ()
 
 
-quickSort :: Ord a => V.Vector a -> V.Vector a
-quickSort v = V.create $ do
+quickSeq :: Ord a => V.Vector a -> V.Vector a
+quickSeq v = V.create $ do
     v' <- V.thaw v
     quickSort' v' 0 (V.length v - 1)
     return v'

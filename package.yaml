@@ -28,6 +28,8 @@ library:
     - bytestring
     - vector
     - deepseq
+    - monad-par
+    - random
 
 executables:
   par-sort-exe:
@@ -43,6 +45,8 @@ executables:
       - vector
       - time
       - deepseq
+      - monad-par
+      - random
 
 tests:
   par-sort-test:

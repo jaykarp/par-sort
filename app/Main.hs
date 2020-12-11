@@ -1,25 +1,22 @@
 module Main where
 
-import Data.Time.Clock
-import Lib ( readLines,
-             mergeSort,
-             quickSort,
-             bitonicSort,
-           )
+import Data.Time.Clock ( diffUTCTime, getCurrentTime )
+import Lib ( readLines, quickSeq, mergeSeq, bitonicSeq, shuffle )
 import Data.List (sort)
 -- import qualified Data.ByteString as B
 import qualified Data.Vector as V
-import Data.Vector ((!))
-import Control.DeepSeq (force)
+import Control.DeepSeq ( force )
 import Data.String ( fromString )
 
 main :: IO ()
 main = do 
-    v <- readLines "res/shuffledwords.txt"
-    time "quickSort" (quickSort v)
+    -- v <- readLines "res/shuffledwords.txt"
+    v <- shuffle $ V.enumFromTo 0 (10^6::Integer)
+    time "quickSort" (quickSeq v)
     time "sort" $ sort (V.toList v)
-    time "mergeSort" (mergeSort v) 
-    time "bitonicsort" (bitonicSort (fromString "zz") v) 
+    time "mergeSort" (mergeSeq v) 
+    -- time "bitonicsort" (bitonicSeq (fromString "zz") v) 
+    time "bitonicsort" (bitonicSeq (10^6) v) 
     where
     time msg a = do
         start <- getCurrentTime

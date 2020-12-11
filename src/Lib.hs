@@ -1,9 +1,9 @@
 module Lib (
-    bitonicSort,
-    mergeSort,
-    quickSort,
-    readLines
+    module Sequential,
+    module Parallel,
+    module Utils,
 ) where
 
-import Sequential ( bitonicSort, mergeSort, quickSort )
-import Utils ( readLines )
+import Sequential ( bitonicSeq, mergeSeq, quickSeq )
+import Parallel ( bitonicPar )
+import Utils ( readLines, shuffle )

@@ -3,8 +3,6 @@ cabal-version: 1.12
 -- This file has been generated from package.yaml by hpack version 0.34.2.
 --
 -- see: https://github.com/sol/hpack
---
--- hash: 6b60446dc7495318dc4945cf0b3d3e0c494a3cfb53849662ec96955f2dafe4c4
 
 name:           par-sort
 version:        0.1.0.0
@@ -39,6 +37,8 @@ library
       base >=4.7 && <5
     , bytestring
     , deepseq
+    , monad-par
+    , random
     , vector
   default-language: Haskell2010
 
@@ -53,7 +53,9 @@ executable par-sort-exe
       base >=4.7 && <5
     , bytestring
     , deepseq
+    , monad-par
     , par-sort
+    , random
     , time
     , vector
   default-language: Haskell2010
