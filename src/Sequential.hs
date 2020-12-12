@@ -1,4 +1,4 @@
-module Sequential where
+module Sequential (bitonicSeq, mergeSeq, quickSeq) where
 
 import Data.Vector ((!))
 import qualified Data.Vector as V

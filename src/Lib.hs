@@ -4,6 +4,6 @@ module Lib (
     module Utils,
 ) where
 
-import Sequential ( bitonicSeq, mergeSeq, quickSeq )
-import Parallel ( bitonicPar )
-import Utils ( readLines, shuffle )
+import Sequential ( bitonicSeq, mergeSeq, quickSeq ) 
+import Parallel ( bitonicPar, merge2, mergePar )
+import Utils ( fillBitonic, readLines, shuffle ) 

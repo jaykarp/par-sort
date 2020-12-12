@@ -1,10 +1,12 @@
-module Parallel (bitonicPar) where
+module Parallel (bitonicPar, mergePar, merge2) where
 import Data.Vector ((!))
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as M
 import Control.Monad (when)
+import Control.Monad.Par (put_, runPar, new, fork, put, get )
 import Utils ( fillBitonic )
-
+import Control.Monad.ST (ST)
+import Debug.Trace
 bitonicPar :: Ord a => a -> V.Vector a -> V.Vector a
 bitonicPar = (bitonic .) . fillBitonic
 
@@ -35,6 +37,8 @@ bitonic v = V.create $ do
             oj <- M.read o j
             when (dir == (oi > oj)) $ M.swap o i j
 
+mergePar :: Ord a => V.Vector a -> V.Vector a
+mergePar = merge . runs
 
 runs :: Ord a => V.Vector a -> V.Vector (V.Vector a)
 runs x = V.create $ do
@@ -85,23 +89,62 @@ merge v = (!0) $ V.create $ do
             | otherwise = return $ k `div` 2
 
 merge2 :: Ord a => V.Vector a -> V.Vector a -> V.Vector a       
-merge2 a b = V.create $ do
+merge2 a b = V.force $ V.create $ do
     v <- M.new (V.length a + V.length b)
-    go 0 0 v
-    return v
-        where go i j v 
-                | i < V.length a && j < V.length b = 
-                    if a!i <= b!j then do
-                        M.write v (i+j) (a!i) 
-                        go (i+1) j v
-                    else do
-                        M.write v (i+j) (b!j)
-                        go i (j+1) v
-                | i < V.length a = do 
-                    M.write v (i+j) (a!i)
-                    go (i+1) j v
-                | j < V.length b = do 
-                    M.write v (i+j) (b!j)
-                    go i (j+1) v
-                | otherwise = return ()
-
+    a' <- V.thaw a  
+    b' <- V.thaw b
+    compareExchange v a' b'
+    return v 
+    where
+        compareExchange v a' b' = runPar $ do
+            x <- new
+            y <- new
+            fork (put_ x $ mergeUpper v a' b')
+            fork (put_ y $ mergeLower v a' b')
+            x' <- get x
+            y' <- get y
+            return (x' >> y')
+        mergeUpper :: Ord a => M.MVector s a -> M.MVector s a -> M.MVector s a -> ST s ()
+        mergeUpper v a' b' = do
+            upper a' b' (M.length a' - 1) (M.length b' - 1) v
+        mergeLower :: Ord a => M.MVector s a -> M.MVector s a -> M.MVector s a -> ST s ()
+        mergeLower v a' b' = do
+            lower a' b' 0 0 v 
+        lower a' b' i j v 
+            | i < M.length a' && j < M.length b' = when (i + j < M.length v) $ do
+                ai <- M.read a' i
+                bj <- M.read b' j
+                if ai <= bj then do
+                    M.write v (i+j) ai
+                    lower a' b' (i+1) j v
+                else do
+                    M.write v (i+j) bj
+                    lower a' b' i (j+1) v
+            | i < M.length a' = when (i + j < M.length v) $ do 
+                ai <- M.read a' i
+                M.write v (i+j) ai
+                lower a' b' (i+1) j v
+            | j < M.length b' = when (i + j < M.length v) $ do 
+                bj <- M.read b' j 
+                M.write v (i+j) bj
+                lower a' b' i (j+1) v
+            | otherwise = return ()
+        upper a' b' i j v  
+            | i >= 0 && j >= 0 = when ((M.length a' - 1 - i) + (M.length b' - 1 - j) < M.length v) $ do
+                ai <- M.read a' i
+                bj <- M.read b' j
+                if ai >= bj then do
+                    M.write v (i + j + 1) ai
+                    upper a' b' (i-1) j v
+                else do
+                    M.write v (i + j + 1) bj
+                    upper a' b' i (j-1) v
+            | i >= 0 = when ((M.length a' - 1) + (M.length b' - 1 - j) < M.length v) $ do 
+                ai <- M.read a' i
+                M.write v (i + j + 1) ai
+                upper a' b' (i-1) j v
+            | j >= 0 = when ((M.length a' - 1) + (M.length b' - 1 - j) < M.length v) $ do 
+                bj <- M.read b' j 
+                M.write v (i + j + 1) bj
+                upper a' b' i (j-1) v
+            | otherwise = return ()
