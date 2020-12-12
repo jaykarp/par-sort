@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 module Main where
 
 import Data.Time.Clock ( diffUTCTime, getCurrentTime )

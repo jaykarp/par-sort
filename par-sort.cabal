@@ -1,8 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
+--
+-- hash: 7904b44338a165cef325cbf441cf290ed275a3a30c98b750ac22bd035dbe8b98
 
 name:           par-sort
 version:        0.1.0.0

@@ -90,22 +90,28 @@ merge v = (!0) $ V.create $ do
 merge2 :: Ord a => V.Vector a -> V.Vector a -> V.Vector a       
 merge2 a b = V.create $ do
     v <- M.new (V.length a + V.length b)
-    go 0 0 v
+    a' <- V.thaw a
+    b' <- V.thaw b
+    go a' b' 0 0 v
     return v
-        where go i j v 
-                | i < V.length a && j < V.length b = 
-                    if a!i <= b!j then do
-                        M.write v (i+j) (a!i) 
-                        go (i+1) j v
+        where go a' b' i j v 
+                | i < V.length a && j < V.length b = do
+                    ai <- M.unsafeRead a' i
+                    bj <- M.unsafeRead b' j
+                    if ai <= bj then do
+                        M.unsafeWrite v (i+j) ai
+                        go a' b' (i+1) j v
                     else do
-                        M.write v (i+j) (b!j)
-                        go i (j+1) v
+                        M.unsafeWrite v (i+j) bj
+                        go a' b' i (j+1) v
                 | i < V.length a = do 
-                    M.write v (i+j) (a!i)
-                    go (i+1) j v
+                    ai <- M.unsafeRead a' i
+                    M.unsafeWrite v (i+j) ai
+                    go a' b' (i+1) j v
                 | j < V.length b = do 
-                    M.write v (i+j) (b!j)
-                    go i (j+1) v
+                    bj <- M.unsafeRead b' j 
+                    M.unsafeWrite v (i+j) bj
+                    go a' b' i (j+1) v
                 | otherwise = return ()
 
 
