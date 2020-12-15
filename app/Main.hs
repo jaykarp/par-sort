@@ -11,12 +11,12 @@ import Data.String ( fromString )
 
 main :: IO ()
 main = do 
-    v <- readLines "res/shuffledwords.txt"
-    -- v <- shuffle $ V.enumFromTo 0 (10^6::Integer)
-    time "quickSort" (quickSeq v)
-    time "sort" $ sort (V.toList v)
+    -- v <- readLines "res/shuffledwords.txt"
+    v <- shuffle $ V.enumFromTo 0 (10^5::Integer)
+    -- time "quickSort" (quickSeq v)
+    -- time "sort" $ sort (V.toList v)
     time "mergeSort" (mergeSeq v) 
-    time "bitonicsort" (bitonicSeq (fromString "zz") v) 
+    -- time "bitonicsort" (bitonicSeq (fromString "zz") v) 
     time "mergePar" (mergePar v) 
     -- time "bitonicsort" (bitonicSeq (10^6) v) 
     where

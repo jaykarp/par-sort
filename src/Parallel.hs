@@ -3,10 +3,12 @@ import Data.Vector ((!))
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as M
 import Control.Monad (when)
-import Control.Monad.Par (put_, runPar, new, fork, put, get )
+import Control.Monad.Par (NFData, put_, runPar, new, fork, put, get )
+import Control.DeepSeq (NFData)
 import Utils ( fillBitonic )
 import Control.Monad.ST (ST)
 import Debug.Trace
+
 bitonicPar :: Ord a => a -> V.Vector a -> V.Vector a
 bitonicPar = (bitonic .) . fillBitonic
 
@@ -37,7 +39,7 @@ bitonic v = V.create $ do
             oj <- M.read o j
             when (dir == (oi > oj)) $ M.swap o i j
 
-mergePar :: Ord a => V.Vector a -> V.Vector a
+mergePar :: (NFData a, Ord a) => V.Vector a -> V.Vector a
 mergePar = merge . runs
 
 runs :: Ord a => V.Vector a -> V.Vector (V.Vector a)
@@ -65,7 +67,7 @@ runs x = V.create $ do
                 M.write o k (V.reverse $ V.slice s (i-s) x)
                 runs' (i+1) x (k+1) o
 
-merge :: Ord a => V.Vector (V.Vector a) -> V.Vector a
+merge :: (NFData a, Ord a) => V.Vector (V.Vector a) -> V.Vector a
 merge v = (!0) $ V.create $ do
     o <- V.thaw v 
     mergeAll (V.length v) o
@@ -88,63 +90,36 @@ merge v = (!0) $ V.create $ do
                 return $ k `div` 2 + 1 
             | otherwise = return $ k `div` 2
 
-merge2 :: Ord a => V.Vector a -> V.Vector a -> V.Vector a       
-merge2 a b = V.force $ V.create $ do
-    v <- M.new (V.length a + V.length b)
-    a' <- V.thaw a  
-    b' <- V.thaw b
-    compareExchange v a' b'
-    return v 
+
+
+merge2 :: (NFData a, Ord a) => V.Vector a -> V.Vector a -> V.Vector a       
+merge2 a b = 
+-- merge2 a b = runPar $ do
+--     fork (put x lower)
+--     fork (put y upper)
+--     a' <- get x
+--     b' <- get y
+--     return $ (V.++) a' b'
+    (V.++) lower upper
     where
-        compareExchange v a' b' = runPar $ do
-            x <- new
-            y <- new
-            fork (put_ x $ mergeUpper v a' b')
-            fork (put_ y $ mergeLower v a' b')
-            x' <- get x
-            y' <- get y
-            return (x' >> y')
-        mergeUpper :: Ord a => M.MVector s a -> M.MVector s a -> M.MVector s a -> ST s ()
-        mergeUpper v a' b' = do
-            upper a' b' (M.length a' - 1) (M.length b' - 1) v
-        mergeLower :: Ord a => M.MVector s a -> M.MVector s a -> M.MVector s a -> ST s ()
-        mergeLower v a' b' = do
-            lower a' b' 0 0 v 
-        lower a' b' i j v 
-            | i < M.length a' && j < M.length b' = when (i + j < M.length v) $ do
-                ai <- M.read a' i
-                bj <- M.read b' j
-                if ai <= bj then do
-                    M.write v (i+j) ai
-                    lower a' b' (i+1) j v
-                else do
-                    M.write v (i+j) bj
-                    lower a' b' i (j+1) v
-            | i < M.length a' = when (i + j < M.length v) $ do 
-                ai <- M.read a' i
-                M.write v (i+j) ai
-                lower a' b' (i+1) j v
-            | j < M.length b' = when (i + j < M.length v) $ do 
-                bj <- M.read b' j 
-                M.write v (i+j) bj
-                lower a' b' i (j+1) v
-            | otherwise = return ()
-        upper a' b' i j v  
-            | i >= 0 && j >= 0 = when ((M.length a' - 1 - i) + (M.length b' - 1 - j) < M.length v) $ do
-                ai <- M.read a' i
-                bj <- M.read b' j
-                if ai >= bj then do
-                    M.write v (i + j + 1) ai
-                    upper a' b' (i-1) j v
-                else do
-                    M.write v (i + j + 1) bj
-                    upper a' b' i (j-1) v
-            | i >= 0 = when ((M.length a' - 1) + (M.length b' - 1 - j) < M.length v) $ do 
-                ai <- M.read a' i
-                M.write v (i + j + 1) ai
-                upper a' b' (i-1) j v
-            | j >= 0 = when ((M.length a' - 1) + (M.length b' - 1 - j) < M.length v) $ do 
-                bj <- M.read b' j 
-                M.write v (i + j + 1) bj
-                upper a' b' i (j-1) v
-            | otherwise = return ()
+        n = V.length a + V.length b 
+        h = n `div` 2
+        third (_,_,x) = x
+        lower = third <$> V.postscanl' accumLower (0,0,undefined) (V.enumFromN 0 h)
+        accumLower (i, j, _) _
+            | i < V.length a && j < V.length b =
+                if a!i <= b!j then
+                    (i+1, j, a!i) 
+                else
+                    (i, j+1, b!j)
+            | i < V.length a = (i+1, j, a!i)
+            | otherwise = (i, j+1, b!j)
+        upper = V.reverse $ third <$> V.postscanl' accumUpper (V.length a - 1,V.length b - 1,undefined) (V.enumFromN 0 (n-h))
+        accumUpper (i, j, _) _ 
+            | i > 0 && j > 0 =
+                if a!i >= b!j then
+                    (i-1, j, a!i) 
+                else
+                    (i, j-1, b!j)
+            | i > 0 = (i-1, j, a!i)
+            | otherwise = (i, j-1, b!j)
