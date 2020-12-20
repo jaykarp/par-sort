@@ -2,13 +2,13 @@
 module Main where
 
 import Data.Time.Clock ( diffUTCTime, getCurrentTime, NominalDiffTime )
-import Lib ( readLines, quickSeq, mergeSeq, bitonicSeq, shuffle, mergePar, bitonicPar )
+import Lib ( readLines, quickSeq, mergeSeq, bitonicSeq, shuffle, mergePar, bitonicPar, merge )
 import Data.List (sort)
 import qualified Data.Vector as V
 import Control.DeepSeq ( NFData, force )
 import Data.String ( fromString )
 import GHC.Generics (Generic)
-newtype Dumb = Dumb (Integer) deriving (Generic)
+newtype Dumb = Dumb (Integer) deriving (Generic, Show)
 
 instance Eq (Dumb) where
     (Dumb 0) == (Dumb 0) = True
@@ -38,6 +38,7 @@ main = do
     s <- time "mergeSeq" (mergeSeq v) 
     p <- time "mergePar" (mergePar v) 
     print $ s / p
+    print $ V.take 10 $ (mergePar v) 
 
 
 
