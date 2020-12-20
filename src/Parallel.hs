@@ -73,50 +73,46 @@ runs x = V.create $ do
                 runs' (i+1) x (k+1) o
 
 
-
 merge :: (NFData a, Ord a) => V.Vector (V.Vector a) -> (V.Vector a)
-merge v = merge' 0 v
+merge v = runEval (merge' 0 v)
     where
     merge' l v
-        
-        | n > 1 = runEval $ do
-          a' <- rpar (force (merge' (l+1) a))
-          b' <- (force (merge' (l+1) b))
-          rseq a'
-          rseq b'
-          if l < 1 then merge2Par a' b' else return $ merge2 a' b' 
-        | n > 1 = merge2 (merge' (l+1) a) (merge' (l+1) b)
-        | otherwise = v!0
+       | n > 1 = do
+            a' <- (merge' (l+1) a) >>= rpar
+            b' <- (merge' (l+1) b) >>= rpar
+            if l < 1 then merge2Par a' b' else return $ merge2 a' b'
+        | otherwise = return $ v!0
         where 
         n = V.length v
         a = V.slice 0 (n `div` 2) v
         b = V.slice (n `div` 2) (n - n `div` 2) v
 
--- merge :: (NFData a, Ord a) => V.Vector (V.Vector a) -> (V.Vector a)
--- merge v = runEval (merge' 0 v)
---     where
---     -- merge' :: Int -> V.Vector (V.Vector a) -> Eval (V.Vector a)
---     merge' l v
---        | n > 1 = do
---             a' <- (merge' (l+1) a) >>= rpar
---             b' <- (merge' (l+1) b) >>= if l > 2 then rpar else rseq
---             if l < 1 then merge2Par a' b' else return $ merge2 a' b'
---         | otherwise = return $ v!0
---         where 
---         n = V.length v
---         a = V.slice 0 (n `div` 2) v
---         b = V.slice (n `div` 2) (n - n `div` 2) v
--- 
--- merge :: (NFData a, Ord a) => V.Vector (V.Vector a) -> (V.Vector a)
--- merge v = mergeAll v 
---     where
---         mergeAll x 
---             | V.length x == 1 = x!0
---             | otherwise = mergeAll (mergePairs x)
---         mergePairs x  
---             | V.length x `mod` 2 == 0 = V.zipWith merge2 (evens x) (odds x) `using` parTraversable rseq
---             | otherwise = V.zipWith merge2 (evens x) (odds x) `V.snoc` (V.last x) `using` parTraversable rseq
---         odds = V.ifilter (\i a -> i `mod` 2 == 0)
+merge2 :: Ord a => V.Vector a -> V.Vector a -> V.Vector a       
+merge2 a b = V.create $ do
+    v <- M.new (V.length a + V.length b)
+    a' <- V.thaw a
+    b' <- V.thaw b
+    go a' b' 0 0 v
+    return v
+        where go a' b' i j v 
+                | i < V.length a && j < V.length b = do
+                    ai <- M.unsafeRead a' i
+                    bj <- M.unsafeRead b' j
+                    if ai <= bj then do
+                        M.unsafeWrite v (i+j) ai
+                        go a' b' (i+1) j v
+                    else do
+                        M.unsafeWrite v (i+j) bj
+                        go a' b' i (j+1) v
+                | i < V.length a = do 
+                    ai <- M.unsafeRead a' i
+                    M.unsafeWrite v (i+j) ai
+                    go a' b' (i+1) j v
+                | j < V.length b = do 
+                    bj <- M.unsafeRead b' j 
+                    M.unsafeWrite v (i+j) bj
+                    go a' b' i (j+1) v
+                | otherwise = return ()
 
 merge2Par :: (NFData a, Ord a) => V.Vector a -> V.Vector a -> Eval (V.Vector a)       
 merge2Par a b = do
