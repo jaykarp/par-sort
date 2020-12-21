@@ -43,8 +43,8 @@ instance NFData (Dumb)
 
 main :: IO ()
 main = do 
-    v <- readLines "res/shuffledwords.txt"
-    v <- shuffle $ V.enumFromN (0 :: Integer) (10^6)
+    -- v <- readLines "res/shuffledwords.txt"
+    v <- shuffle $ V.enumFromN (0 :: Integer) (10^7)
     -- s <- time "mergeSeq" (mergeSeq v) 
     time "mergePar" (mergePar v) 
     time "quickNaivePar" (quickNaivePar v)

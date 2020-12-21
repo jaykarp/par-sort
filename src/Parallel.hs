@@ -3,6 +3,7 @@ import Data.Vector ((!))
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as M
 import qualified Data.Vector.Split as S
+import Data.List.Split (chunksOf)
 import Control.Monad (when)
 import Control.Parallel (par)
 import Control.Parallel.Strategies 
@@ -51,23 +52,21 @@ quickNaivePar v = merge $ V.fromList $ parMap rdeepseq quickSeq chunks
 quickPar :: (NFData a, Ord a, Show a) => V.Vector a -> V.Vector a
 quickPar v = runEval $ quickPar' chunks    
     where
-    quickPar' :: (Show a, NFData a, Ord a) => V.Vector (V.Vector a) -> Eval (V.Vector a)
-    quickPar' vs
-        | V.length vs == 0 = return V.empty 
-        | V.length vs == 1 = return $ quickSeq $ vs!0 
-        | otherwise = do 
-            let p = V.last . V.last $ vs 
-            let vs' = V.init vs `V.snoc` (V.last $ V.init $ vs)
-            vs'' <- parTraversable rdeepseq $ V.map (V.partition (<p)) vs'
-            let lower = fst <$> vs'' 
-            let upper = snd <$> vs''
-            let lower' = V.fromList $ filter (not . null) $ (V.concat . V.toList) <$> S.chunksOf 2 lower  
-            let upper' = V.fromList $ filter (not . null) $ (V.concat . V.toList) <$> S.chunksOf 2 upper  
+    quickPar' :: (Show a, NFData a, Ord a) => [V.Vector a] -> Eval (V.Vector a)
+    quickPar' [] = return V.empty 
+    quickPar' [v] = rpar (quickSeq $ v)
+    quickPar' (v:vs) = do 
+            let p = V.head v 
+            vs' <- parList rdeepseq ((V.partition (<p)) <$> ((V.tail v):vs))
+            lower <- parList rdeepseq (fst <$> vs')
+            upper <- parList rdeepseq (snd <$> vs')
+            lower' <- parList rdeepseq (filter (not . null) $ V.concat <$> chunksOf 2 lower) 
+            upper' <- parList rdeepseq (filter (not . null) $ V.concat <$> chunksOf 2 upper)
             lower'' <- quickPar' lower' 
             upper'' <- quickPar' upper'
-            return $ (lower'') V.++ upper''
+            rpar ((lower'' `V.snoc` p) V.++ upper'')
     n = V.length v
-    chunks = V.fromList $ S.chunksOf (n `div` 8) v
+    chunks = S.chunksOf (n `div` 32) v
 
 mergePar :: (NFData a, Ord a) => V.Vector a -> V.Vector a
 mergePar = merge . runs
