@@ -33,6 +33,7 @@ library:
     - mtl
     - random
     - abstract-par
+    - vector-split
 
 executables:
   par-sort-exe:

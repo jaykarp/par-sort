@@ -2,7 +2,16 @@
 module Main where
 
 import Data.Time.Clock ( diffUTCTime, getCurrentTime, NominalDiffTime )
-import Lib ( readLines, quickSeq, mergeSeq, bitonicSeq, shuffle, mergePar, bitonicPar, merge )
+import Lib (
+    readLines,
+    quickSeq,
+    mergeSeq,
+    bitonicSeq,
+    shuffle, 
+    mergePar,
+    bitonicPar,
+    quickNaivePar,
+    )
 import Data.List (sort)
 import qualified Data.Vector as V
 import Control.DeepSeq ( NFData, force )
@@ -33,12 +42,12 @@ instance NFData (Dumb)
 
 main :: IO ()
 main = do 
-    -- v <- readLines "res/shuffledwords.txt"
-    v <- shuffle $ V.enumFromN (10^4 :: Dumb) (10^3)
-    s <- time "mergeSeq" (mergeSeq v) 
-    p <- time "mergePar" (mergePar v) 
-    print $ s / p
-    print $ V.take 10 $ (mergePar v) 
+    v <- readLines "res/shuffledwords.txt"
+    -- v <- shuffle $ V.enumFromN (0 :: Integer) (10^6)
+    -- s <- time "mergeSeq" (mergeSeq v) 
+    time "mergePar" (mergePar v) 
+    time "quickNaivePar" (quickNaivePar v)
+    return ()
 
 
 

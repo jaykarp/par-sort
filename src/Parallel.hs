@@ -1,18 +1,15 @@
-module Parallel (bitonicPar, mergePar, merge) where
+module Parallel (bitonicPar, mergePar, quickNaivePar) where
 import Data.Vector ((!))
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as M
+import qualified Data.Vector.Split as S
 import Control.Monad (when)
-import Control.Monad.Trans (liftIO)
--- import Control.Monad.Par (NFData, put_, runPar, new, fork, put, get )
-import Control.Monad.Par.Class
-import Control.Monad.Par.IO (runParIO) 
-import System.IO.Unsafe (unsafePerformIO)
 import Control.Parallel (par)
 import Control.Parallel.Strategies 
 import Control.DeepSeq (NFData, force)
 import Utils ( fillBitonic )
 import Debug.Trace
+import Sequential (quickSeq)
 
 bitonicPar :: Ord a => a -> V.Vector a -> IO (V.Vector a)
 bitonicPar = (bitonic .) . fillBitonic
@@ -43,6 +40,14 @@ bitonic v = do
             oi <- M.read o i
             oj <- M.read o j
             when (dir == (oi > oj)) $ M.swap o i j
+
+-- naive quicksort algorithm
+quickNaivePar :: (NFData a, Ord a) => V.Vector a -> V.Vector a
+quickNaivePar v = merge $ V.fromList $ parMap rdeepseq quickSeq chunks
+    where 
+    n = V.length v
+    chunks = S.chunksOf (n `div` 8) v
+
 
 mergePar :: (NFData a, Ord a) => V.Vector a -> V.Vector a
 mergePar = merge . runs
@@ -78,8 +83,8 @@ merge v = runEval (merge' 0 v)
     where
     merge' l v
        | n > 1 = do
-            a' <- (merge' (l+1) a) >>= rpar
-            b' <- (merge' (l+1) b) >>= rpar
+            a' <- (merge' (l+1) a) >>= if l < 15 then rpar else rseq
+            b' <- (merge' (l+1) b) >>= if l < 15 then rpar else rseq
             if l < 1 then merge2Par a' b' else return $ merge2 a' b'
         | otherwise = return $ v!0
         where 
