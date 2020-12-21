@@ -1,4 +1,4 @@
-module Parallel (bitonicPar, mergePar, quickNaivePar) where
+module Parallel (bitonicPar, mergePar, quickNaivePar, quickPar) where
 import Data.Vector ((!))
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as M
@@ -46,8 +46,28 @@ quickNaivePar :: (NFData a, Ord a) => V.Vector a -> V.Vector a
 quickNaivePar v = merge $ V.fromList $ parMap rdeepseq quickSeq chunks
     where 
     n = V.length v
-    chunks = S.chunksOf (n `div` 8) v
+    chunks = S.chunksOf (n `div` 32) v
 
+quickPar :: (NFData a, Ord a, Show a) => V.Vector a -> V.Vector a
+quickPar v = runEval $ quickPar' chunks    
+    where
+    quickPar' :: (Show a, NFData a, Ord a) => V.Vector (V.Vector a) -> Eval (V.Vector a)
+    quickPar' vs
+        | V.length vs == 0 = return V.empty 
+        | V.length vs == 1 = return $ quickSeq $ vs!0 
+        | otherwise = do 
+            let p = V.last . V.last $ vs 
+            let vs' = V.init vs `V.snoc` (V.last $ V.init $ vs)
+            vs'' <- parTraversable rdeepseq $ V.map (V.partition (<p)) vs'
+            let lower = fst <$> vs'' 
+            let upper = snd <$> vs''
+            let lower' = V.fromList $ filter (not . null) $ (V.concat . V.toList) <$> S.chunksOf 2 lower  
+            let upper' = V.fromList $ filter (not . null) $ (V.concat . V.toList) <$> S.chunksOf 2 upper  
+            lower'' <- quickPar' lower' 
+            upper'' <- quickPar' upper'
+            return $ (lower'') V.++ upper''
+    n = V.length v
+    chunks = V.fromList $ S.chunksOf (n `div` 8) v
 
 mergePar :: (NFData a, Ord a) => V.Vector a -> V.Vector a
 mergePar = merge . runs

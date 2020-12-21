@@ -11,6 +11,7 @@ import Lib (
     mergePar,
     bitonicPar,
     quickNaivePar,
+    quickPar,
     )
 import Data.List (sort)
 import qualified Data.Vector as V
@@ -43,10 +44,11 @@ instance NFData (Dumb)
 main :: IO ()
 main = do 
     v <- readLines "res/shuffledwords.txt"
-    -- v <- shuffle $ V.enumFromN (0 :: Integer) (10^6)
+    v <- shuffle $ V.enumFromN (0 :: Integer) (10^6)
     -- s <- time "mergeSeq" (mergeSeq v) 
     time "mergePar" (mergePar v) 
     time "quickNaivePar" (quickNaivePar v)
+    time "quickPar" (quickPar v)
     return ()
 
 
