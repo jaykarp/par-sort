@@ -34,6 +34,7 @@ library:
     - random
     - abstract-par
     - vector-split
+    - split
 
 executables:
   par-sort-exe:
