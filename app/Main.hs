@@ -85,3 +85,5 @@ runBitonic _ _ _ = die usage
 
 main :: IO ()
 main = getArgs >>= runFromArgs 
+
+-- for i in {1..128}; do stack exec -- par-sort-exe +RTS -N8 -lf -ls -A600M -RTS -s default -i res/shuffledwords.txt >> res/default.txt; done;
