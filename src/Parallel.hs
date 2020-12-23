@@ -1,13 +1,15 @@
-module Parallel (mergePar, quickNaivePar, quickPar) where
+module Parallel (bitonicPar, mergePar, hybridPar, quickPar) where
 import Data.Vector ((!))
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as M
 import qualified Data.Vector.Split as S
 import Data.List.Split (chunksOf)
-import Control.Monad (when, guard)
+import Control.Monad (when, guard, void)
 import Control.Parallel (par)
-import Control.Concurrent.ParallelIO.Local
 import Control.Parallel.Strategies 
+import Control.Monad.Par.IO
+import Control.Monad.Par.Class
+import Control.Monad.IO.Class
 import Control.DeepSeq (NFData, force)
 import Utils ( fillBitonic )
 import Debug.Trace
@@ -15,135 +17,59 @@ import Sequential (quickSeq)
 import Data.Bits (xor, (.&.))
 import Data.Vector.Strategies
 
-bitonicPar :: (NFData a, Ord a) => a -> V.Vector a -> (V.Vector a)
+bitonicPar :: (NFData a, Ord a) => a -> V.Vector a -> IO (V.Vector a)
 bitonicPar = (bitonic .) . fillBitonic
 
--- bitonic :: Ord a => V.Vector a -> IO (V.Vector a)
--- bitonic v = do
---     o <- V.thaw v 
---     bitonicSort' o 0 (V.length v) True 
---     V.freeze o
---     where 
---         bitonicSort' o low cnt dir = 
---             when (cnt > 1) $ do 
---                 let k = cnt `div` 2
---                 bitonicSort' o low k True
---                 bitonicSort' o (low + k) k False
---                 bitonicMerge o low cnt dir
---         bitonicMerge o low cnt dir =
---             when (cnt > 1) $ do
---                 let k = cnt `div` 2
---                 loopSwap o low low k dir
---                 bitonicMerge o low k dir
---                 bitonicMerge o (low+k) k dir
---         loopSwap o low i k dir = 
---             when (i < low + k) $ do
---                 compareAndSwap o i (i+k) dir
---                 loopSwap o low (i+1) k dir
---         compareAndSwap o i j dir = do
---             oi <- M.read o i
---             oj <- M.read o j
---             when (dir == (oi > oj)) $ M.swap o i j
-
--- bitonic :: (NFData a, Ord a) => V.Vector a -> V.Vector a
--- bitonic v = runEval $ bitonic' 0 v True
---     where
---     bitonic' l v asc
---         | V.length v > 1 = do
---             let (a, b) = V.splitAt (V.length v `div` 2) v
---             a' <- bitonic' (l+1) a True
---             b' <- bitonic' (l+1) b False
---             bitonicMerge l (a' V.++ b') asc
---         | otherwise = return v
---     bitonicMerge l v asc 
---         | V.length v > 1 = do
---             let n = V.length v 
---             let (a, b) = V.splitAt (n `div` 2) v
---             v' <- parVector 8 (V.zipWith (compAndSwap asc) a b)
---             let (a', b') = (V.unzip v')
---             a'' <- bitonicMerge (l+1) a' asc
---             b'' <- bitonicMerge (l+1) b' asc
---             return (a'' V.++ b'')
---         | otherwise = return v
---     compAndSwap asc a b = if asc == (a > b) then (b, a) else (a, b)
---     m = V.length v
-
--- bitonic :: (NFData a, Ord a) => V.Vector a -> V.Vector a
--- bitonic v = runEval $ bitonic' True v
---     where
---     bitonic' d v
---         | V.length v <= 1 = return v
---         | otherwise = do
---             let (l, r) = V.splitAt (V.length v `div` 2) v
---             a <- bitonic' d l >>= rpar
---             b <- bitonic' (not d) r >>= rpar
---             bitonicMerge d $ a V.++ b 
---     bitonicMerge d v
---         | V.length v <= 1 = return v 
---         | otherwise = do
---             let (l, r) = V.splitAt (V.length v `div` 2) v
---             l' <- parTraversable rdeepseq $ V.zipWith (leftCmp d) l r
---             r' <- parTraversable rdeepseq $ V.zipWith (rightCmp d) l r
---             a <- bitonicMerge d l' >>= rpar
---             b <- bitonicMerge d r' >>= rpar
---             return $ a V.++ b 
---     leftCmp d = if d then min else max 
---     rightCmp d = if d then max else min 
-
--- bitonic :: Ord a => V.Vector a -> IO (V.Vector a)
--- bitonic v = do
---     o <- V.unsafeThaw v
---     sequence_ $ (\l -> withPool 8 $ \pool -> parallel_ pool ((cmp o) <$> l)) <$> bitonicSequence (V.length v) 
---     V.unsafeFreeze o
---     where 
---     cmp o (i, l, a) = do
---         oi <- M.read o i
---         ol <- M.read o l
---         when ((a && (oi > ol)) || ((not a) && (oi < ol))) $ M.swap o i l
-        
---     bitonicSequence n = do 
---         k <- takeWhile (<=n) $ iterate (*2) 2 
---         j <- takeWhile (>0) $ iterate (`div` 2) (k `div` 2)
---         return $ do
---             i <- [0..(n - 1)]
---             let l = xor i j 
---             guard (l > i) 
---             return (i, l, i .&. k == 0) 
-
-bitonic :: (NFData a, Ord a) => V.Vector a -> V.Vector a
-bitonic v = runEval $ foldl update' (return v) (bitonicSequence (V.length v))
+bitonic :: Ord a => V.Vector a -> IO (V.Vector a)
+bitonic v = do
+    o <- V.thaw v 
+    runParIO $ bitonicSort' o 0 (V.length v) True 0
+    V.freeze o
     where 
-    cmp v (i, l, a) = 
-        let (vi, vl) = (v!i, v!l) in
-        if ((a && (vi > vl)) || ((not a) && (vi < vl))) then [(i, vl), (l, vi)] else []  
-    update' mv l = do
-        v <- mv 
-        let c = V.length v `div` 256 
-        l' <- parListChunk c rseq ((cmp v) <$> l)
-        l'' <- parListChunk c rdeepseq $ concat l'  
-        parVector $ v V.// l''
-    bitonicSequence n = do 
-        k <- takeWhile (<=n) $ iterate (*2) 2 
-        j <- takeWhile (>0) $ iterate (`div` 2) (k `div` 2)
-        return $ do
-            i <- [0..(n - 1)]
-            let l = xor i j 
-            guard (l > i) 
-            return (i, l, i .&. k == 0) 
+        bitonicSort' o low cnt dir l = 
+            when (cnt > 1) $ do 
+                let k = cnt `div` 2
+                if l < 7 then do
+                    a <- spawn $ bitonicSort' o low k True (l+1)
+                    b <- spawn $ bitonicSort' o (low + k) k False (l+1)
+                    get a
+                    get b
+                else do
+                    bitonicSort' o low k True (l+1)
+                    bitonicSort' o (low + k) k False (l+1)
+                bitonicMerge o low cnt dir l
+        bitonicMerge o low cnt dir l =
+            when (cnt > 1) $ do
+                let k = cnt `div` 2
+                loopSwap o low low k dir 
+                if l < 7 then do
+                    a <- spawn $ bitonicMerge o low k dir (l+1)
+                    b <- spawn $ bitonicMerge o (low+k) k dir (l+1)
+                    get a
+                    get b
+                else do
+                    bitonicMerge o low k dir (l+1)
+                    bitonicMerge o (low+k) k dir (l+1)
+        loopSwap o low i k dir = 
+            when (i < low + k) $ do
+                loopSwap o low (i+1) k dir
+                liftIO $ compareAndSwap o i (i+k) dir
+        compareAndSwap o i j dir = do
+            oi <- M.read o i
+            oj <- M.read o j
+            when (dir == (oi > oj)) $ M.swap o i j
+        n = V.length v 
 
-
-
--- naive quicksort algorithm
-quickNaivePar :: (NFData a, Ord a) => V.Vector a -> V.Vector a
-quickNaivePar v = merge $ V.fromList $ parMap rdeepseq quickSeq chunks
+hybridPar :: (NFData a, Ord a) => V.Vector a -> V.Vector a
+hybridPar v = merge $ V.fromList $ parMap rdeepseq quickSeq chunks
     where 
     n = V.length v
     chunks = S.chunksOf (n `div` 32) v
 
-quickPar :: (NFData a, Ord a, Show a) => V.Vector a -> V.Vector a
+quickPar :: (NFData a, Ord a) => V.Vector a -> V.Vector a
 quickPar v = runEval $ quickPar' chunks    
     where
-    quickPar' :: (Show a, NFData a, Ord a) => [V.Vector a] -> Eval (V.Vector a)
+    quickPar' :: (NFData a, Ord a) => [V.Vector a] -> Eval (V.Vector a)
     quickPar' [] = return V.empty 
     quickPar' [v] = rpar (quickSeq $ v)
     quickPar' (v:vs) = do 

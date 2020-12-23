@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7582b431e9b7ce4c91b26a62bc226aeb78db0a789b3d102a6f1aa24c9c63dbf2
+-- hash: b3ba355e2ac5aec3d3c578083950f93d988e3bc053b59462517ad5e62627842f
 
 name:           par-sort
 version:        0.1.0.0
@@ -46,6 +46,7 @@ library
     , random
     , repa
     , split
+    , time
     , vector
     , vector-split
     , vector-strategies
@@ -57,7 +58,7 @@ executable par-sort-exe
       Paths_par_sort
   hs-source-dirs:
       app
-  ghc-options: -rtsopts -eventlog -threaded -O2
+  ghc-options: -Wall -rtsopts -eventlog -threaded -O2
   build-depends:
       base >=4.7 && <5
     , bytestring

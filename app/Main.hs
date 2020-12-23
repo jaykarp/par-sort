@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveGeneric, TypeOperators #-} 
 module Main where
 
-import Data.Time.Clock ( diffUTCTime, getCurrentTime, NominalDiffTime )
 import Lib (
     readLines,
     quickSeq,
@@ -9,65 +8,80 @@ import Lib (
     bitonicSeq,
     shuffle, 
     mergePar,
-    tsort,
-    quickNaivePar,
+    bitonicPar,
+    hybridPar,
     quickPar,
-    )
+    time,
+    timeIO )
 import Data.List (sort)
 import qualified Data.Vector as V
-import Control.DeepSeq ( NFData, force )
 import Data.String ( fromString )
-import GHC.Generics (Generic)
-import Data.Array.Repa hiding ((++))
-newtype Dumb = Dumb (Integer) deriving (Generic, Show)
+import System.Environment ( getArgs )
+import System.Console.GetOpt 
+import System.Exit ( die )
+import Control.DeepSeq ( NFData )
+-- TODO:
+-- parallel or not "-p"
+-- Specify which sort we want to run "-s { default, bitonic, quick, merge, hybrid }" (by default this is default (haskell sort))
+    -- Specify bitonic filler "-f "
+-- Specify wether we want to time it or not
+-- Output or not
+-- ints vs file pointer
+-- whether or not to use dumb data structure and where to start it from
 
-instance Eq (Dumb) where
-    (Dumb 0) == (Dumb 0) = True
-    (Dumb x) == (Dumb 0) = False
-    (Dumb 0) == (Dumb y) = False 
-    (Dumb x) == (Dumb y) = Dumb (x-1) == Dumb (y-1)
 
-instance Ord (Dumb) where
-    (Dumb x) <= (Dumb 0) = x <= 0 
-    (Dumb 0) <= (Dumb y) = y >= 0 
-    (Dumb x) <= (Dumb y) = (Dumb (x-1)) <= (Dumb (y-1)) 
+data Arg
+    = Sort String                   -- -s
+    | Input String                  -- -i
+    | Size String                   -- -z 
+    | Help                          -- --help
+    deriving (Eq, Ord, Show)
 
-instance Num (Dumb) where
-    (+) (Dumb a) (Dumb b) = Dumb $ a + b
-    (*) (Dumb a) (Dumb b) = Dumb $ a * b
-    abs (Dumb a) = Dumb $ abs a
-    fromInteger = Dumb
-    negate (Dumb a) = Dumb $ -a
-    signum (Dumb a) = Dumb $ signum a
+options :: [OptDescr Arg]
+options = [
+      Option ['s'] ["sort"] (ReqArg Sort "") "default | bitonicSeq | mergeSeq | quickSeq | bitonicPar | mergePar | quickPar | hybrid"  
+    , Option ['i'] ["input"] (ReqArg Input "") "File path"
+    , Option ['z'] ["size"] (ReqArg Size "") "2^z size of array to be sorted"
+    , Option ['h'] ["help"] (NoArg Help) "Print this help message"
+    ]
 
-instance NFData (Dumb)
+
+runFromArgs :: [String] -> IO ()
+runFromArgs args = case opt of  
+    Help:_ -> die usage 
+    (Sort s):(Input f):_ -> do
+        v <- readLines f 
+        if s == "bitonicSeq" || s == "bitonicPar" then
+            runBitonic s (fromString "") v
+        else
+            runSort s v
+    (Sort s):(Size z):_ -> do
+        let n = read z :: Int
+        v <- shuffle $ V.enumFromN (1 :: Int) (2^n)
+        if s == "bitonicSeq" || s == "bitonicPar" then
+            runBitonic s 0 v
+        else
+            runSort s v
+    _ -> die usage 
+    where 
+    (opt,_,_) = getOpt Permute options args 
+
+usage :: String
+usage = "Usage: parsort -s [default | bitonicSeq | mergeSeq | quickSeq | bitonicPar | mergePar | quickPar | hybrid] -i [file] -z [size]"
+
+runSort :: (NFData a, Ord a) => String -> V.Vector a -> IO ()
+runSort "default"    v = time "Default Sort" (sort $ V.toList $ v)
+runSort "quickSeq"   v = time "Sequential Quicksort" (quickSeq v)
+runSort "mergeSeq"   v = time "Sequential Merge Sort" (mergeSeq v)
+runSort "hybrid"     v = time "Parallel Hybrid Sort" (hybridPar v)
+runSort "quickPar"   v = time "Parallel Quick Sort" (quickPar v)
+runSort "mergePar"   v = time "Parallel Merge Sort" (mergePar v)
+runSort _ _ = die usage
+
+runBitonic :: (NFData a, Ord a) => String -> a -> V.Vector a -> IO ()
+runBitonic "bitonicSeq" a v = time "Sequential Bitonic Sort" (bitonicSeq a v)
+runBitonic "bitonicPar" a v = timeIO "Parallel Bitonic Sort" (bitonicPar a v)
+runBitonic _ _ _ = die usage
 
 main :: IO ()
-main = do 
-    -- v <- readLines "res/shuffledwords.txt"
-    v <- shuffle $ V.enumFromN (1 :: Int) (2^15)
-    let arr = fromListUnboxed (Z :. 2^15) (V.toList v) 
-    -- s <- time "mergeSeq" (mergeSeq v) 
-    -- time "mergePar" (mergePar v) 
-    -- time "quickNaivePar" (quickNaivePar v)
-    -- time "quickPar" (quickPar v)
-    -- time "bitonicSeq" (bitonicSeq 0 v)
-
-    -- print $ V.take 10 $ (bitonicPar 0 v)
-    return ()
-
-
-
-time :: (NFData a) => String -> a -> IO NominalDiffTime
-time msg a = do
-    start <- getCurrentTime
-    let a' = force a
-    end <- a' `seq` getCurrentTime
-    putStrLn $ msg ++ ": " ++ show (diffUTCTime end start)
-    return $ diffUTCTime end start
-
-timeIO msg io = do
-    start <- getCurrentTime
-    a <- io
-    end <- (force a) `seq` getCurrentTime
-    putStrLn $ msg ++ ": " ++ show (diffUTCTime end start)
+main = getArgs >>= runFromArgs 

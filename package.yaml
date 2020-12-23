@@ -38,12 +38,14 @@ library:
     - split
     - vector-strategies
     - repa
+    - time
 
 executables:
   par-sort-exe:
     main: Main.hs
     source-dirs: app
     ghc-options:
+      - -Wall
       - -rtsopts
       - -eventlog
       - -threaded
