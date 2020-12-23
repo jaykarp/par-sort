@@ -1,4 +1,4 @@
-{-# Language DeriveGeneric #-} 
+{-# LANGUAGE DeriveGeneric, TypeOperators #-} 
 module Main where
 
 import Data.Time.Clock ( diffUTCTime, getCurrentTime, NominalDiffTime )
@@ -9,7 +9,7 @@ import Lib (
     bitonicSeq,
     shuffle, 
     mergePar,
-    bitonicPar,
+    tsort,
     quickNaivePar,
     quickPar,
     )
@@ -18,6 +18,7 @@ import qualified Data.Vector as V
 import Control.DeepSeq ( NFData, force )
 import Data.String ( fromString )
 import GHC.Generics (Generic)
+import Data.Array.Repa hiding ((++))
 newtype Dumb = Dumb (Integer) deriving (Generic, Show)
 
 instance Eq (Dumb) where
@@ -44,11 +45,15 @@ instance NFData (Dumb)
 main :: IO ()
 main = do 
     -- v <- readLines "res/shuffledwords.txt"
-    v <- shuffle $ V.enumFromN (0 :: Integer) (10^7)
+    v <- shuffle $ V.enumFromN (1 :: Int) (2^15)
+    let arr = fromListUnboxed (Z :. 2^15) (V.toList v) 
     -- s <- time "mergeSeq" (mergeSeq v) 
-    time "mergePar" (mergePar v) 
-    time "quickNaivePar" (quickNaivePar v)
-    time "quickPar" (quickPar v)
+    -- time "mergePar" (mergePar v) 
+    -- time "quickNaivePar" (quickNaivePar v)
+    -- time "quickPar" (quickPar v)
+    -- time "bitonicSeq" (bitonicSeq 0 v)
+
+    -- print $ V.take 10 $ (bitonicPar 0 v)
     return ()
 
 

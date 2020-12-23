@@ -1,0 +1,391 @@
+	Tue Dec 22 15:41 2020 Time and Allocation Profiling Report  (Final)
+
+	   par-sort-exe +RTS -N1 -p -ls -lf -A600M -s -RTS
+
+	total time  =        8.26 secs   (8261 ticks @ 1000 us, 1 processor)
+	total alloc = 5,141,878,672 bytes  (excludes profiling overheads)
+
+COST CENTRE                MODULE                            SRC                                                    %time %alloc
+
+bitonic.bitonicMerge       Parallel                          src/Parallel.hs:(58,5)-(67,30)                          21.9   26.7
+>>=                        Data.Vector.Fusion.Util           Data/Vector/Fusion/Util.hs:36:3-18                      19.9   20.5
+bitonic.bitonicMerge.(...) Parallel                          src/Parallel.hs:63:17-39                                10.5   12.2
+primitive                  Control.Monad.Primitive           Control/Monad/Primitive.hs:205:3-16                     10.4    4.0
+fmap                       Data.Vector.Fusion.Stream.Monadic Data/Vector/Fusion/Stream/Monadic.hs:(133,3)-(135,20)    7.2    7.4
+basicUnsafeWrite           Data.Vector.Mutable               Data/Vector/Mutable.hs:120:3-65                          5.3    6.2
+bitonic.compareAndSwap     Sequential                        src/Sequential.hs:(34,9)-(37,50)                         4.3    0.0
+basicUnsafeIndexM          Data.Vector                       Data/Vector.hs:290:3-62                                  3.7    2.5
+bitonic.compAndSwap        Parallel                          src/Parallel.hs:68:5-67                                  3.3    0.9
+basicUnsafeSlice           Data.Vector.Mutable               Data/Vector/Mutable.hs:91:3-62                           3.2    4.3
+basicUnsafeFreeze          Data.Vector                       Data/Vector.hs:(276,3)-(277,47)                          2.1    4.1
+basicUnsafeRead            Data.Vector.Mutable               Data/Vector/Mutable.hs:117:3-59                          1.7    3.7
+basicUnsafeNew             Data.Vector.Mutable               Data/Vector/Mutable.hs:(101,3)-(104,32)                  1.6    2.6
+bitonic.bitonicMerge.(...) Parallel                          src/Parallel.hs:61:17-48                                 0.7    1.7
+
+
+                                                                                                                                                       individual      inherited
+COST CENTRE                         MODULE                                   SRC                                                   no.      entries  %time %alloc   %time %alloc
+
+MAIN                                MAIN                                     <built-in>                                            1047          0    0.0    0.0   100.0  100.0
+ CAF                                Data.Time.Clock.Internal.NominalDiffTime <entire-module>                                       1199          0    0.0    0.0     0.0    0.0
+ CAF                                Data.Fixed                               <entire-module>                                       1183          0    0.0    0.0     0.0    0.0
+ CAF                                GHC.Conc.Signal                          <entire-module>                                       1156          0    0.0    0.0     0.0    0.0
+ CAF                                GHC.IO.Encoding                          <entire-module>                                       1139          0    0.0    0.0     0.0    0.0
+ CAF                                GHC.IO.Encoding.Iconv                    <entire-module>                                       1137          0    0.0    0.0     0.0    0.0
+ CAF                                GHC.IO.Handle.FD                         <entire-module>                                       1129          0    0.0    0.0     0.0    0.0
+ CAF                                GHC.IO.Handle.Text                       <entire-module>                                       1127          0    0.0    0.0     0.0    0.0
+ CAF                                GHC.Event.Thread                         <entire-module>                                       1086          0    0.0    0.0     0.0    0.0
+ CAF                                GHC.Event.Poll                           <entire-module>                                       1065          0    0.0    0.0     0.0    0.0
+ CAF:$dmrandomIO4                   System.Random                            <no location info>                                    1208          0    0.0    0.0     0.0    0.0
+  getTime                           System.Random                            System/Random.hs:(131,1)-(134,60)                     2142          1    0.0    0.0     0.0    0.0
+ CAF:$fApplicativeBox_$cpure        Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:45:3-6                     1867          0    0.0    0.0     0.0    0.0
+  pure                              Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:45:3-12                    2288          1    0.0    0.0     0.0    0.0
+ CAF:$fApplicativeId4               Data.Vector.Fusion.Util                  <no location info>                                    1864          0    0.0    0.0     0.0    0.0
+  pure                              Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:31:3-11                    2120          1    0.0    0.0     0.0    0.0
+ CAF:$fMonadBox_$creturn            Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:49:3-8                     1868          0    0.0    0.0     0.0    0.0
+  return                            Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:49:3-15                    2287          1    0.0    0.0     0.0    0.0
+ CAF:$fMonadEval1                   Control.Parallel.Strategies              <no location info>                                    1880          0    0.0    0.0     0.0    0.0
+  return                            Control.Parallel.Strategies              Control/Parallel/Strategies.hs:211:35-39              2344          1    0.0    0.0     0.0    0.0
+ CAF:$fMonadEval3                   Control.Parallel.Strategies              <no location info>                                    1882          0    0.0    0.0     0.0    0.0
+  >>=                               Control.Parallel.Strategies              Control/Parallel/Strategies.hs:211:35-39              2337          1    0.0    0.0     0.0    0.0
+ CAF:$fMonadId1                     Data.Vector.Fusion.Util                  <no location info>                                    1866          0    0.0    0.0     0.0    0.0
+  return                            Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:35:3-15                    2119          1    0.0    0.0     0.0    0.0
+ CAF:$fPrimMonadST1_r5gV            Control.Monad.Primitive                  <no location info>                                    1410          0    0.0    0.0     0.0    0.0
+  primitive                         Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2124          1    0.0    0.0     0.0    0.0
+ CAF:$fRandomGenStdGen_$cnext       System.Random                            System/Random.hs:218:3-6                              1212          0    0.0    0.0     0.0    0.0
+  next                              System.Random                            System/Random.hs:218:3-17                             2159          1    0.0    0.0     0.0    0.0
+ CAF:b_rjwa                         System.Random                            System/Random.hs:473:8                                1218          0    0.0    0.0     0.0    0.0
+  randomIvalInteger                 System.Random                            System/Random.hs:(468,1)-(489,76)                     2186          0    0.0    0.0     0.0    0.0
+   randomIvalInteger.b              System.Random                            System/Random.hs:473:8-54                             2187          1    0.0    0.0     0.0    0.0
+ CAF:doBoundsChecks                 Data.Vector.Internal.Check               Data/Vector/Internal/Check.hs:55:1-14                 1869          0    0.0    0.0     0.0    0.0
+  doBoundsChecks                    Data.Vector.Internal.Check               Data/Vector/Internal/Check.hs:55:1-21                 2132          1    0.0    0.0     0.0    0.0
+ CAF:doInternalChecks               Data.Vector.Internal.Check               Data/Vector/Internal/Check.hs:71:1-16                 1871          0    0.0    0.0     0.0    0.0
+  doInternalChecks                  Data.Vector.Internal.Check               Data/Vector/Internal/Check.hs:71:1-24                 2112          1    0.0    0.0     0.0    0.0
+ CAF:doUnsafeChecks                 Data.Vector.Internal.Check               Data/Vector/Internal/Check.hs:64:1-14                 1870          0    0.0    0.0     0.0    0.0
+  doUnsafeChecks                    Data.Vector.Internal.Check               Data/Vector/Internal/Check.hs:64:1-22                 2113          1    0.0    0.0     0.0    0.0
+ CAF:ds_rjvY                        System.Random                            <no location info>                                    1204          0    0.0    0.0     0.0    0.0
+  randomIvalInteger                 System.Random                            System/Random.hs:(468,1)-(489,76)                     2182          0    0.0    0.0     0.0    0.0
+   randomIvalInteger.(...)          System.Random                            System/Random.hs:472:8-36                             2183          1    0.0    0.0     0.0    0.0
+    genRange                        System.Random                            System/Random.hs:219:3-23                             2184          1    0.0    0.0     0.0    0.0
+ CAF:genhi_rjw1                     System.Random                            System/Random.hs:472:16-20                            1207          0    0.0    0.0     0.0    0.0
+  randomIvalInteger                 System.Random                            System/Random.hs:(468,1)-(489,76)                     2188          0    0.0    0.0     0.0    0.0
+   randomIvalInteger.genhi          System.Random                            System/Random.hs:472:8-36                             2189          1    0.0    0.0     0.0    0.0
+ CAF:genlo_rjvZ                     System.Random                            System/Random.hs:472:9-13                             1205          0    0.0    0.0     0.0    0.0
+  randomIvalInteger                 System.Random                            System/Random.hs:(468,1)-(489,76)                     2180          0    0.0    0.0     0.0    0.0
+   randomIvalInteger.genlo          System.Random                            System/Random.hs:472:8-36                             2181          1    0.0    0.0     0.0    0.0
+ CAF:lvl1_rjw0                      System.Random                            <no location info>                                    1206          0    0.0    0.0     0.0    0.0
+  randomIvalInteger                 System.Random                            System/Random.hs:(468,1)-(489,76)                     2177          0    0.0    0.0     0.0    0.0
+   randomIvalInteger.f              System.Random                            System/Random.hs:(486,8)-(489,76)                     2178          0    0.0    0.0     0.0    0.0
+    randomIvalInteger.f.v'          System.Random                            System/Random.hs:489:25-76                            2179          0    0.0    0.0     0.0    0.0
+ CAF:lvl71_rh3V                     Utils                                    <no location info>                                    1958          0    0.0    0.0     0.0    0.0
+  fillBitonic                       Utils                                    src/Utils.hs:(28,1)-(35,13)                           2239          0    0.0    0.0     0.0    0.0
+   fillBitonic.n                    Utils                                    src/Utils.hs:31:9-56                                  2240          0    0.0    0.0     0.0    0.0
+ CAF:main1                          Main                                     <no location info>                                    2092          0    0.0    0.0     0.0    0.0
+  main                              Main                                     app/Main.hs:(45,1)-(55,13)                            2094          1    0.0    0.0     0.0    0.0
+ CAF:main11                         Main                                     <no location info>                                    2091          0    0.0    0.0     0.0    0.0
+  main                              Main                                     app/Main.hs:(45,1)-(55,13)                            2096          0    0.0    0.0     0.0    0.0
+   shuffle                          Utils                                    src/Utils.hs:(18,1)-(24,14)                           2097          1    0.0    0.0     0.0    0.0
+ CAF:main12                         Main                                     <no location info>                                    2088          0    0.0    0.0     0.0    0.0
+  main                              Main                                     app/Main.hs:(45,1)-(55,13)                            2103          0    0.0    0.0     0.0    0.0
+   elemseq                          Data.Vector.Generic.Base                 Data/Vector/Generic/Base.hs:146:3-23                  2104          1    0.0    0.0     0.0    0.0
+    elemseq.\                       Data.Vector.Generic.Base                 Data/Vector/Generic/Base.hs:146:23                    2105          1    0.0    0.0     0.0    0.0
+ CAF:main2                          Main                                     <no location info>                                    2089          0    0.0    0.0     0.0    0.0
+  main                              Main                                     app/Main.hs:(45,1)-(55,13)                            2296          0    0.0    0.0     0.0    0.0
+   bitonicPar                       Parallel                                 src/Parallel.hs:19:1-38                               2297          1    0.0    0.0     0.0    0.0
+ CAF:main3                          Main                                     <no location info>                                    2083          0    0.0    0.0     0.0    0.0
+ CAF:main5                          Main                                     <no location info>                                    2090          0    0.0    0.0     0.0    0.0
+  main                              Main                                     app/Main.hs:(45,1)-(55,13)                            2207          0    0.0    0.0     0.0    0.0
+   bitonicSeq                       Sequential                               src/Sequential.hs:10:1-38                             2208          1    0.0    0.0     0.0    0.0
+ CAF:main6                          Main                                     <no location info>                                    2084          0    0.0    0.0     0.0    0.0
+ CAF:main9                          Main                                     <no location info>                                    2082          0    0.0    0.0     0.0    0.0
+  rnf                               Data.Vector                              Data/Vector.hs:231:3-20                               2201          1    0.0    0.0     0.0    0.0
+   liftRnfV                         Data.Vector                              Data/Vector.hs:228:1-44                               2202          1    0.0    0.0     0.0    0.0
+ CAF:main_x                         Main                                     <no location info>                                    2087          0    0.0    0.0     0.0    0.0
+  main                              Main                                     app/Main.hs:(45,1)-(55,13)                            2106          0    0.0    0.0     0.0    0.0
+   elemseq                          Data.Vector.Generic.Base                 Data/Vector/Generic/Base.hs:146:3-23                  2107          1    0.0    0.0     0.0    0.0
+    elemseq.\                       Data.Vector.Generic.Base                 Data/Vector/Generic/Base.hs:146:23                    2108          1    0.0    0.0     0.0    0.0
+ CAF:main_x1                        Main                                     <no location info>                                    2086          0    0.0    0.0     0.3    0.2
+  main                              Main                                     app/Main.hs:(45,1)-(55,13)                            2109          0    0.1    0.1     0.3    0.2
+   >>=                              Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:36:3-18                    2118      32769    0.0    0.0     0.1    0.1
+    fmap                            Data.Vector.Fusion.Stream.Monadic        Data/Vector/Fusion/Stream/Monadic.hs:(133,3)-(135,20) 2121      32769    0.1    0.0     0.1    0.1
+     basicUnsafeWrite               Data.Vector.Mutable                      Data/Vector/Mutable.hs:120:3-65                       2122      32768    0.0    0.0     0.0    0.0
+      primitive                     Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2125          0    0.0    0.0     0.0    0.0
+       marray#                      Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2126      32768    0.0    0.0     0.0    0.0
+   basicUnsafeSlice                 Data.Vector.Mutable                      Data/Vector/Mutable.hs:91:3-62                        2123      32769    0.0    0.0     0.0    0.0
+   unId                             Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2117      32769    0.0    0.0     0.0    0.0
+   basicUnsafeFreeze                Data.Vector                              Data/Vector.hs:(276,3)-(277,47)                       2128          1    0.0    0.0     0.0    0.0
+    primitive                       Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2129          1    0.0    0.0     0.0    0.0
+     marray#                        Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2130          1    0.0    0.0     0.0    0.0
+   basicUnsafeNew                   Data.Vector.Mutable                      Data/Vector/Mutable.hs:(101,3)-(104,32)               2114          1    0.0    0.0     0.0    0.0
+    primitive                       Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2115          1    0.0    0.0     0.0    0.0
+   sChunks                          Data.Vector.Fusion.Bundle.Monadic        Data/Vector/Fusion/Bundle/Monadic.hs:122:30-36        2116          1    0.0    0.0     0.0    0.0
+   sSize                            Data.Vector.Fusion.Bundle.Monadic        Data/Vector/Fusion/Bundle/Monadic.hs:124:30-34        2111          1    0.0    0.0     0.0    0.0
+   upperBound                       Data.Vector.Fusion.Bundle.Size           Data/Vector/Fusion/Bundle/Size.hs:(126,1)-(128,30)    2110          1    0.0    0.0     0.0    0.0
+ CAF:q_rjwb                         System.Random                            System/Random.hs:481:8                                1219          0    0.0    0.0     0.0    0.0
+  randomIvalInteger                 System.Random                            System/Random.hs:(468,1)-(489,76)                     2153          0    0.0    0.0     0.0    0.0
+   randomIvalInteger.q              System.Random                            System/Random.hs:481:8-15                             2154          1    0.0    0.0     0.0    0.0
+ CAF:runEval                        Control.Parallel.Strategies              Control/Parallel/Strategies.hs:219:1-7                1890          0    0.0    0.0     0.0    0.0
+  runEval                           Control.Parallel.Strategies              Control/Parallel/Strategies.hs:219:1-42               2300          1    0.0    0.0     0.0    0.0
+ CAF:stdRange                       System.Random                            System/Random.hs:514:1-8                              1203          0    0.0    0.0     0.0    0.0
+  stdRange                          System.Random                            System/Random.hs:514:1-26                             2185          1    0.0    0.0     0.0    0.0
+ CAF:theStdGen                      System.Random                            System/Random.hs:566:1-9                              1209          0    0.0    0.0     0.0    0.0
+  theStdGen                         System.Random                            System/Random.hs:(566,1)-(568,15)                     2140          1    0.0    0.0     0.0    0.0
+   mkStdRNG                         System.Random                            System/Random.hs:(452,1)-(455,55)                     2141          1    0.0    0.0     0.0    0.0
+    createStdGen                    System.Random                            System/Random.hs:276:1-44                             2161          1    0.0    0.0     0.0    0.0
+     mkStdGen32                     System.Random                            System/Random.hs:(267,1)-(273,36)                     2162          1    0.0    0.0     0.0    0.0
+      mkStdGen32.(...)              System.Random                            System/Random.hs:272:9-39                             2164          1    0.0    0.0     0.0    0.0
+      mkStdGen32.q                  System.Random                            System/Random.hs:272:9-39                             2167          1    0.0    0.0     0.0    0.0
+      mkStdGen32.s                  System.Random                            System/Random.hs:271:9-45                             2165          1    0.0    0.0     0.0    0.0
+      mkStdGen32.s1                 System.Random                            System/Random.hs:272:9-39                             2163          1    0.0    0.0     0.0    0.0
+      mkStdGen32.s2                 System.Random                            System/Random.hs:273:9-36                             2166          1    0.0    0.0     0.0    0.0
+    getTime                         System.Random                            System/Random.hs:(131,1)-(134,60)                     2143          0    0.0    0.0     0.0    0.0
+     getTime.daytime                System.Random                            System/Random.hs:133:7-44                             2144          1    0.0    0.0     0.0    0.0
+ main                               Main                                     app/Main.hs:(45,1)-(55,13)                            2095          0    0.4    0.0    99.7   99.8
+  bitonic.loopSwap                  Sequential                               src/Sequential.hs:(30,9)-(33,42)                      2272    2424833    0.4    0.0    10.8    5.2
+   bitonic.compareAndSwap           Sequential                               src/Sequential.hs:(34,9)-(37,50)                      2273    1966080    4.3    0.0    10.4    5.2
+    basicLength                     Data.Vector.Mutable                      Data/Vector/Mutable.hs:88:3-33                        2274    5899476    0.0    0.0     0.0    0.0
+    basicUnsafeRead                 Data.Vector.Mutable                      Data/Vector/Mutable.hs:117:3-59                       2275    5899476    1.6    3.7     4.2    3.7
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2276    5899476    2.5    0.0     2.5    0.0
+      marray#                       Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2277    5899476    0.0    0.0     0.0    0.0
+    basicUnsafeWrite                Data.Vector.Mutable                      Data/Vector/Mutable.hs:120:3-65                       2278    1967316    0.7    1.5     1.9    1.5
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2279    1967316    1.2    0.0     1.2    0.0
+      marray#                       Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2280    1967316    0.0    0.0     0.0    0.0
+  bitonic.bitonicMerge              Parallel                                 src/Parallel.hs:(58,5)-(67,30)                        2366     950273    1.5    2.5     1.5    2.5
+   basicLength                      Data.Vector                              Data/Vector.hs:284:3-32                               2368     950273    0.0    0.0     0.0    0.0
+   unId                             Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2367     950273    0.0    0.0     0.0    0.0
+   rseq                             Control.Parallel.Strategies              Control/Parallel/Strategies.hs:429:1-26               2370     458753    0.0    0.0     0.0    0.0
+  bitonic.bitonicMerge              Sequential                               src/Sequential.hs:(24,9)-(29,45)                      2270     950273    0.2    0.1     0.2    0.1
+   bitonic.bitonicMerge.k           Sequential                               src/Sequential.hs:26:21-35                            2271     458753    0.0    0.0     0.0    0.0
+  bitonic.bitonic'                  Parallel                                 src/Parallel.hs:(51,5)-(57,30)                        2334      65535    0.1    0.3     0.2    0.5
+   basicLength                      Data.Vector                              Data/Vector.hs:284:3-32                               2336      65535    0.0    0.0     0.0    0.0
+   unId                             Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2335      65535    0.0    0.0     0.0    0.0
+   bitonic.bitonic'.(...)           Parallel                                 src/Parallel.hs:53:17-57                              2340      32767    0.1    0.2     0.1    0.2
+    basicLength                     Data.Vector                              Data/Vector.hs:284:3-32                               2343      65534    0.0    0.0     0.0    0.0
+    basicUnsafeSlice                Data.Vector                              Data/Vector.hs:287:3-60                               2341      65534    0.0    0.0     0.0    0.0
+    unId                            Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2342      65534    0.0    0.0     0.0    0.0
+   bitonic.bitonic'.a               Parallel                                 src/Parallel.hs:53:17-57                              2339      32767    0.0    0.0     0.0    0.0
+   bitonic.bitonic'.b               Parallel                                 src/Parallel.hs:53:17-57                              2345      32767    0.0    0.0     0.0    0.0
+  bitonic.bitonicSort'              Sequential                               src/Sequential.hs:(18,9)-(23,42)                      2268      65535    0.0    0.0     0.0    0.0
+   bitonic.bitonicSort'.k           Sequential                               src/Sequential.hs:20:21-35                            2269      32767    0.0    0.0     0.0    0.0
+  time                              Main                                     app/Main.hs:(60,1)-(65,34)                            2199          2    0.0    0.0     0.2    0.1
+   time.a'                          Main                                     app/Main.hs:62:9-20                                   2200          2    0.0    0.0     0.2    0.1
+    rnf                             Data.Vector                              Data/Vector.hs:231:3-20                               2203          0    0.0    0.0     0.2    0.1
+     liftRnfV                       Data.Vector                              Data/Vector.hs:228:1-44                               2204          0    0.0    0.0     0.2    0.1
+      >>=                           Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:36:3-18                    2289     131074    0.1    0.1     0.2    0.1
+       liftRnfV.\                   Data.Vector                              Data/Vector.hs:228:34-40                              2290      65536    0.0    0.0     0.0    0.0
+       basicUnsafeIndexM            Data.Vector                              Data/Vector.hs:290:3-62                               2291      65534    0.0    0.0     0.0    0.0
+        array#                      Data.Primitive.Array                     Data/Primitive/Array.hs:87:5-10                       2292      65534    0.0    0.0     0.0    0.0
+      basicLength                   Data.Vector                              Data/Vector.hs:284:3-32                               2284          2    0.0    0.0     0.0    0.0
+      basicUnsafeIndexM             Data.Vector                              Data/Vector.hs:290:3-62                               2285          2    0.0    0.0     0.0    0.0
+       array#                       Data.Primitive.Array                     Data/Primitive/Array.hs:87:5-10                       2286          2    0.0    0.0     0.0    0.0
+      sElems                        Data.Vector.Fusion.Bundle.Monadic        Data/Vector/Fusion/Bundle/Monadic.hs:121:30-35        2206          2    0.0    0.0     0.0    0.0
+      unId                          Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2205          2    0.0    0.0     0.0    0.0
+  bitonicPar                        Parallel                                 src/Parallel.hs:19:1-38                               2298          0    0.0    0.0    85.4   90.5
+   bitonic                          Parallel                                 src/Parallel.hs:(49,1)-(69,18)                        2299          1    0.0    0.0    85.4   90.5
+    runEval                         Control.Parallel.Strategies              Control/Parallel/Strategies.hs:219:1-42               2301          0    0.0    0.0    85.4   90.5
+     unEval_                        Control.Parallel.Strategies              Control/Parallel/Strategies.hs:210:24-30              2302          1    0.0    0.0     0.0    0.0
+     bitonic.bitonic'               Parallel                                 src/Parallel.hs:(51,5)-(57,30)                        2338          0    0.8    0.4    85.4   90.5
+      >>=                           Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:36:3-18                    2354     131068    0.0    0.1     0.0    0.1
+      basicLength                   Data.Vector                              Data/Vector.hs:284:3-32                               2346     131068    0.0    0.0     0.0    0.0
+      unId                          Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2353     131068    0.0    0.0     0.0    0.0
+      basicUnsafeSlice              Data.Vector.Mutable                      Data/Vector/Mutable.hs:91:3-62                        2356      98301    0.1    0.0     0.1    0.0
+      basicUnsafeCopy               Data.Vector                              Data/Vector.hs:(293,3)-(294,29)                       2355      65534    0.1    0.1     0.1    0.1
+       primitive                    Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2357          0    0.1    0.0     0.1    0.0
+      +                             Data.Vector.Fusion.Bundle.Size           Data/Vector/Fusion/Bundle/Size.hs:(26,3)-(32,29)      2349      32767    0.0    0.0     0.0    0.0
+      basicUnsafeFreeze             Data.Vector                              Data/Vector.hs:(276,3)-(277,47)                       2363      32767    0.0    0.1     0.0    0.1
+       primitive                    Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2364      32767    0.0    0.0     0.0    0.0
+        marray#                     Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2365      32767    0.0    0.0     0.0    0.0
+      basicUnsafeNew                Data.Vector.Mutable                      Data/Vector/Mutable.hs:(101,3)-(104,32)               2350      32767    0.0    0.0     0.1    0.2
+       primitive                    Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2351      32767    0.1    0.1     0.1    0.1
+      sChunks                       Data.Vector.Fusion.Bundle.Monadic        Data/Vector/Fusion/Bundle/Monadic.hs:122:30-36        2352      32767    0.0    0.0     0.0    0.0
+      sSize                         Data.Vector.Fusion.Bundle.Monadic        Data/Vector/Fusion/Bundle/Monadic.hs:124:30-34        2348      32767    0.0    0.0     0.0    0.0
+      upperBound                    Data.Vector.Fusion.Bundle.Size           Data/Vector/Fusion/Bundle/Size.hs:(126,1)-(128,30)    2347      32767    0.0    0.0     0.0    0.0
+      bitonic.bitonicMerge          Parallel                                 src/Parallel.hs:(58,5)-(67,30)                        2369          0   20.4   24.1    84.3   89.7
+       >>=                          Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:36:3-18                    2388   12582918    7.7   12.5    16.2   17.4
+        fmap                        Data.Vector.Fusion.Stream.Monadic        Data/Vector/Fusion/Stream/Monadic.hs:(133,3)-(135,20) 2389    4390913    2.8    2.4     5.3    4.0
+         basicUnsafeWrite           Data.Vector.Mutable                      Data/Vector/Mutable.hs:120:3-65                       2392    1966080    1.7    1.5     2.5    1.5
+          primitive                 Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2394          0    0.8    0.0     0.8    0.0
+           marray#                  Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2395    1966080    0.0    0.0     0.0    0.0
+        bitonic.compAndSwap         Parallel                                 src/Parallel.hs:68:5-67                               2432    1966080    3.3    0.9     3.3    0.9
+       unId                         Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2387    6225925    0.0    0.0     0.0    0.0
+       basicUnsafeIndexM            Data.Vector                              Data/Vector.hs:290:3-62                               2390    3932160    2.0    1.2     2.0    1.2
+        array#                      Data.Primitive.Array                     Data/Primitive/Array.hs:87:5-10                       2391    3932160    0.0    0.0     0.0    0.0
+       basicUnsafeSlice             Data.Vector.Mutable                      Data/Vector/Mutable.hs:91:3-62                        2393    3801092    1.4    1.8     1.4    1.8
+       basicLength                  Data.Vector                              Data/Vector.hs:284:3-32                               2380    2752518    0.2    0.1     0.2    0.1
+       basicUnsafeCopy              Data.Vector                              Data/Vector.hs:(293,3)-(294,29)                       2425     917506    0.8    0.9     1.7    0.9
+        primitive                   Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2426          0    0.9    0.0     0.9    0.0
+       basicUnsafeFreeze            Data.Vector                              Data/Vector.hs:(276,3)-(277,47)                       2397     917506    1.1    2.0     1.7    2.3
+        primitive                   Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2398     917506    0.6    0.3     0.6    0.3
+         marray#                    Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2399     917506    0.0    0.0     0.0    0.0
+       basicUnsafeNew               Data.Vector.Mutable                      Data/Vector/Mutable.hs:(101,3)-(104,32)               2384     917506    0.7    1.3     1.4    3.1
+        primitive                   Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2385     917506    0.7    1.8     0.7    1.8
+       sChunks                      Data.Vector.Fusion.Bundle.Monadic        Data/Vector/Fusion/Bundle/Monadic.hs:122:30-36        2386     917506    0.0    0.0     0.0    0.0
+       sSize                        Data.Vector.Fusion.Bundle.Monadic        Data/Vector/Fusion/Bundle/Monadic.hs:124:30-34        2383     917506    0.0    0.0     0.0    0.0
+       upperBound                   Data.Vector.Fusion.Bundle.Size           Data/Vector/Fusion/Bundle/Size.hs:(126,1)-(128,30)    2382     917506    0.0    0.0     0.0    0.0
+       +                            Data.Vector.Fusion.Bundle.Size           Data/Vector/Fusion/Bundle/Size.hs:(26,3)-(32,29)      2424     458753    0.1    0.3     0.1    0.3
+       bitonic.bitonicMerge.(...)   Parallel                                 src/Parallel.hs:63:17-39                              2401     458753   10.5   12.2    38.3   36.6
+        >>=                         Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:36:3-18                    2410   13631492   12.1    7.8    20.9   15.7
+         fmap                       Data.Vector.Fusion.Stream.Monadic        Data/Vector/Fusion/Stream/Monadic.hs:(133,3)-(135,20) 2411    4849666    4.3    4.9     8.8    8.0
+          basicUnsafeWrite          Data.Vector.Mutable                      Data/Vector/Mutable.hs:120:3-65                       2414    3932160    2.9    3.1     4.5    3.1
+           primitive                Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2416          0    1.6    0.0     1.6    0.0
+            marray#                 Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2417    3932160    0.0    0.0     0.0    0.0
+        basicUnsafeSlice            Data.Vector.Mutable                      Data/Vector/Mutable.hs:91:3-62                        2415    4849666    1.6    2.4     1.6    2.4
+        unId                        Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2409    4849666    0.0    0.0     0.0    0.0
+        basicUnsafeIndexM           Data.Vector                              Data/Vector.hs:290:3-62                               2412    3932160    1.7    1.2     1.7    1.2
+         array#                     Data.Primitive.Array                     Data/Primitive/Array.hs:87:5-10                       2413    3932160    0.0    0.0     0.0    0.0
+        sSize                       Data.Vector.Fusion.Bundle.Monadic        Data/Vector/Fusion/Bundle/Monadic.hs:124:30-34        2405    1835012    0.0    0.0     0.0    0.0
+        basicLength                 Data.Vector                              Data/Vector.hs:284:3-32                               2402     917506    0.0    0.0     0.0    0.0
+        basicUnsafeFreeze           Data.Vector                              Data/Vector.hs:(276,3)-(277,47)                       2420     917506    0.9    2.0     1.5    2.3
+         primitive                  Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2421     917506    0.6    0.3     0.6    0.3
+          marray#                   Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2422     917506    0.0    0.0     0.0    0.0
+        basicUnsafeNew              Data.Vector.Mutable                      Data/Vector/Mutable.hs:(101,3)-(104,32)               2406     917506    0.9    1.3     2.0    2.8
+         primitive                  Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2407     917506    1.2    1.5     1.2    1.5
+        sChunks                     Data.Vector.Fusion.Bundle.Monadic        Data/Vector/Fusion/Bundle/Monadic.hs:122:30-36        2408     917506    0.0    0.0     0.0    0.0
+        sElems                      Data.Vector.Fusion.Bundle.Monadic        Data/Vector/Fusion/Bundle/Monadic.hs:121:30-35        2403     917506    0.0    0.0     0.0    0.0
+        upperBound                  Data.Vector.Fusion.Bundle.Size           Data/Vector/Fusion/Bundle/Size.hs:(126,1)-(128,30)    2404     917506    0.0    0.0     0.0    0.0
+       bitonic.bitonicMerge.(...)   Parallel                                 src/Parallel.hs:61:17-48                              2376     458753    0.7    1.7     0.7    1.7
+        basicUnsafeSlice            Data.Vector                              Data/Vector.hs:287:3-60                               2379     917506    0.0    0.0     0.0    0.0
+        basicLength                 Data.Vector                              Data/Vector.hs:284:3-32                               2378     458753    0.0    0.0     0.0    0.0
+        unId                        Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2377     458753    0.0    0.0     0.0    0.0
+       bitonic.bitonicMerge.a       Parallel                                 src/Parallel.hs:61:17-48                              2375     458753    0.0    0.0     0.0    0.0
+       bitonic.bitonicMerge.a'      Parallel                                 src/Parallel.hs:63:17-39                              2400     458753    0.0    0.0     0.0    0.0
+       bitonic.bitonicMerge.b       Parallel                                 src/Parallel.hs:61:17-48                              2381     458753    0.0    0.0     0.0    0.0
+       bitonic.bitonicMerge.b'      Parallel                                 src/Parallel.hs:63:17-39                              2423     458753    0.0    0.0     0.0    0.0
+       bitonic.bitonicMerge.n       Parallel                                 src/Parallel.hs:60:17-30                              2372     458753    0.2    0.1     0.2    0.1
+        basicLength                 Data.Vector                              Data/Vector.hs:284:3-32                               2374     458753    0.0    0.0     0.0    0.0
+        unId                        Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2373     458753    0.0    0.0     0.0    0.0
+       rseq                         Control.Parallel.Strategies              Control/Parallel/Strategies.hs:429:1-26               2371          0    0.0    0.0     0.0    0.0
+   fillBitonic                      Utils                                    src/Utils.hs:(28,1)-(35,13)                           2303          1    0.0    0.0     0.0    0.0
+    basicLength                     Data.Vector.Mutable                      Data/Vector/Mutable.hs:88:3-33                        2325          3    0.0    0.0     0.0    0.0
+    basicInitialize                 Data.Vector.Mutable                      Data/Vector/Mutable.hs:108:3-31                       2322          1    0.0    0.0     0.0    0.0
+    basicLength                     Data.Vector                              Data/Vector.hs:284:3-32                               2306          1    0.0    0.0     0.0    0.0
+    basicOverlaps                   Data.Vector.Mutable                      Data/Vector/Mutable.hs:(94,3)-(98,37)                 2327          1    0.0    0.0     0.0    0.0
+     marray#                        Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2328          2    0.0    0.0     0.0    0.0
+    basicUnsafeCopy                 Data.Vector.Mutable                      Data/Vector/Mutable.hs:(123,3)-(124,36)               2329          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2330          1    0.0    0.0     0.0    0.0
+    basicUnsafeCopy                 Data.Vector                              Data/Vector.hs:(293,3)-(294,29)                       2308          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2309          1    0.0    0.0     0.0    0.0
+    basicUnsafeFreeze               Data.Vector                              Data/Vector.hs:(276,3)-(277,47)                       2331          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2332          1    0.0    0.0     0.0    0.0
+      marray#                       Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2333          1    0.0    0.0     0.0    0.0
+    basicUnsafeGrow                 Data.Vector.Generic.Mutable.Base         Data/Vector/Generic/Mutable/Base.hs:(140,3)-(146,23)  2314          1    0.0    0.0     0.0    0.0
+     basicUnsafeCopy                Data.Vector.Mutable                      Data/Vector/Mutable.hs:(123,3)-(124,36)               2320          1    0.0    0.0     0.0    0.0
+      primitive                     Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2321          1    0.0    0.0     0.0    0.0
+     basicUnsafeGrow.n              Data.Vector.Generic.Mutable.Base         Data/Vector/Generic/Mutable/Base.hs:146:7-23          2316          1    0.0    0.0     0.0    0.0
+      basicLength                   Data.Vector.Mutable                      Data/Vector/Mutable.hs:88:3-33                        2317          1    0.0    0.0     0.0    0.0
+     basicUnsafeNew                 Data.Vector.Mutable                      Data/Vector/Mutable.hs:(101,3)-(104,32)               2315          1    0.0    0.0     0.0    0.0
+      primitive                     Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2318          1    0.0    0.0     0.0    0.0
+     basicUnsafeSlice               Data.Vector.Mutable                      Data/Vector/Mutable.hs:91:3-62                        2319          1    0.0    0.0     0.0    0.0
+    basicUnsafeNew                  Data.Vector.Mutable                      Data/Vector/Mutable.hs:(101,3)-(104,32)               2304          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2307          1    0.0    0.0     0.0    0.0
+    basicUnsafeReplicate            Data.Vector.Mutable                      Data/Vector/Mutable.hs:(111,3)-(114,32)               2323          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2324          1    0.0    0.0     0.0    0.0
+    basicUnsafeSlice                Data.Vector.Mutable                      Data/Vector/Mutable.hs:91:3-62                        2326          1    0.0    0.0     0.0    0.0
+    fillBitonic.l                   Utils                                    src/Utils.hs:30:9-22                                  2310          1    0.0    0.0     0.0    0.0
+     basicLength                    Data.Vector                              Data/Vector.hs:284:3-32                               2312          1    0.0    0.0     0.0    0.0
+     unId                           Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2311          1    0.0    0.0     0.0    0.0
+    fillBitonic.n                   Utils                                    src/Utils.hs:31:9-56                                  2313          1    0.0    0.0     0.0    0.0
+    unId                            Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2305          1    0.0    0.0     0.0    0.0
+  bitonicSeq                        Sequential                               src/Sequential.hs:10:1-38                             2209          0    0.0    0.0     0.0    0.0
+   bitonic                          Sequential                               src/Sequential.hs:(13,1)-(37,50)                      2261          1    0.0    0.0     0.0    0.0
+    basicLength                     Data.Vector                              Data/Vector.hs:284:3-32                               2264          2    0.0    0.0     0.0    0.0
+    unId                            Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2263          2    0.0    0.0     0.0    0.0
+    basicUnsafeCopy                 Data.Vector                              Data/Vector.hs:(293,3)-(294,29)                       2266          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2267          1    0.0    0.0     0.0    0.0
+    basicUnsafeFreeze               Data.Vector                              Data/Vector.hs:(276,3)-(277,47)                       2281          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2282          1    0.0    0.0     0.0    0.0
+      marray#                       Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2283          1    0.0    0.0     0.0    0.0
+    basicUnsafeNew                  Data.Vector.Mutable                      Data/Vector/Mutable.hs:(101,3)-(104,32)               2262          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2265          1    0.0    0.0     0.0    0.0
+   fillBitonic                      Utils                                    src/Utils.hs:(28,1)-(35,13)                           2228          1    0.0    0.0     0.0    0.0
+    basicLength                     Data.Vector.Mutable                      Data/Vector/Mutable.hs:88:3-33                        2252          3    0.0    0.0     0.0    0.0
+    basicInitialize                 Data.Vector.Mutable                      Data/Vector/Mutable.hs:108:3-31                       2249          1    0.0    0.0     0.0    0.0
+    basicLength                     Data.Vector                              Data/Vector.hs:284:3-32                               2231          1    0.0    0.0     0.0    0.0
+    basicOverlaps                   Data.Vector.Mutable                      Data/Vector/Mutable.hs:(94,3)-(98,37)                 2254          1    0.0    0.0     0.0    0.0
+     marray#                        Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2255          2    0.0    0.0     0.0    0.0
+    basicUnsafeCopy                 Data.Vector.Mutable                      Data/Vector/Mutable.hs:(123,3)-(124,36)               2256          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2257          1    0.0    0.0     0.0    0.0
+    basicUnsafeCopy                 Data.Vector                              Data/Vector.hs:(293,3)-(294,29)                       2233          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2234          1    0.0    0.0     0.0    0.0
+    basicUnsafeFreeze               Data.Vector                              Data/Vector.hs:(276,3)-(277,47)                       2258          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2259          1    0.0    0.0     0.0    0.0
+      marray#                       Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2260          1    0.0    0.0     0.0    0.0
+    basicUnsafeGrow                 Data.Vector.Generic.Mutable.Base         Data/Vector/Generic/Mutable/Base.hs:(140,3)-(146,23)  2241          1    0.0    0.0     0.0    0.0
+     basicUnsafeCopy                Data.Vector.Mutable                      Data/Vector/Mutable.hs:(123,3)-(124,36)               2247          1    0.0    0.0     0.0    0.0
+      primitive                     Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2248          1    0.0    0.0     0.0    0.0
+     basicUnsafeGrow.n              Data.Vector.Generic.Mutable.Base         Data/Vector/Generic/Mutable/Base.hs:146:7-23          2243          1    0.0    0.0     0.0    0.0
+      basicLength                   Data.Vector.Mutable                      Data/Vector/Mutable.hs:88:3-33                        2244          1    0.0    0.0     0.0    0.0
+     basicUnsafeNew                 Data.Vector.Mutable                      Data/Vector/Mutable.hs:(101,3)-(104,32)               2242          1    0.0    0.0     0.0    0.0
+      primitive                     Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2245          1    0.0    0.0     0.0    0.0
+     basicUnsafeSlice               Data.Vector.Mutable                      Data/Vector/Mutable.hs:91:3-62                        2246          1    0.0    0.0     0.0    0.0
+    basicUnsafeNew                  Data.Vector.Mutable                      Data/Vector/Mutable.hs:(101,3)-(104,32)               2229          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2232          1    0.0    0.0     0.0    0.0
+    basicUnsafeReplicate            Data.Vector.Mutable                      Data/Vector/Mutable.hs:(111,3)-(114,32)               2250          1    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2251          1    0.0    0.0     0.0    0.0
+    basicUnsafeSlice                Data.Vector.Mutable                      Data/Vector/Mutable.hs:91:3-62                        2253          1    0.0    0.0     0.0    0.0
+    fillBitonic.l                   Utils                                    src/Utils.hs:30:9-22                                  2235          1    0.0    0.0     0.0    0.0
+     basicLength                    Data.Vector                              Data/Vector.hs:284:3-32                               2237          1    0.0    0.0     0.0    0.0
+     unId                           Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2236          1    0.0    0.0     0.0    0.0
+    fillBitonic.n                   Utils                                    src/Utils.hs:31:9-56                                  2238          1    0.0    0.0     0.0    0.0
+    unId                            Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2230          1    0.0    0.0     0.0    0.0
+  shuffle                           Utils                                    src/Utils.hs:(18,1)-(24,14)                           2098          0    0.1    0.1     1.0    0.7
+   unId                             Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2136      32770    0.0    0.0     0.0    0.0
+   basicUnsafeWrite                 Data.Vector.Mutable                      Data/Vector/Mutable.hs:120:3-65                       2191      32768    0.0    0.0     0.0    0.0
+    primitive                       Control.Monad.Primitive                  Control/Monad/Primitive.hs:93:3-16                    2192      32768    0.0    0.0     0.0    0.0
+     marray#                        Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2193      32768    0.0    0.0     0.0    0.0
+   shuffle.\                        Utils                                    src/Utils.hs:20:44-59                                 2137      32768    0.0    0.0     0.6    0.5
+    randomRIO                       System.Random                            System/Random.hs:321:3-49                             2138      32768    0.0    0.0     0.6    0.5
+     getStdRandom                   System.Random                            System/Random.hs:(586,1)-(587,26)                     2139      32768    0.0    0.1     0.5    0.4
+      getStdRandom.swap             System.Random                            System/Random.hs:587:9-26                             2145      32768    0.0    0.0     0.0    0.0
+      randomR                       System.Random                            System/Random.hs:345:34-61                            2148          0    0.0    0.0     0.4    0.3
+       randomIvalIntegral           System.Random                            System/Random.hs:462:1-71                             2149          0    0.0    0.0     0.4    0.3
+        randomIvalInteger           System.Random                            System/Random.hs:(468,1)-(489,76)                     2150      32768    0.2    0.1     0.4    0.3
+         randomIvalInteger.f        System.Random                            System/Random.hs:(486,8)-(489,76)                     2155      65536    0.0    0.0     0.2    0.2
+          randomIvalInteger.f.(...) System.Random                            System/Random.hs:488:25-39                            2158      32768    0.0    0.0     0.2    0.2
+           next                     System.Random                            System/Random.hs:218:3-17                             2160          0    0.0    0.0     0.1    0.2
+            stdNext                 System.Random                            System/Random.hs:(518,1)-(528,64)                     2168      32768    0.1    0.1     0.1    0.1
+             stdNext.k              System.Random                            System/Random.hs:522:17-38                            2171      32768    0.0    0.0     0.0    0.0
+             stdNext.k'             System.Random                            System/Random.hs:526:17-38                            2174      32768    0.0    0.0     0.0    0.0
+             stdNext.s1'            System.Random                            System/Random.hs:523:17-59                            2172      32768    0.0    0.0     0.0    0.0
+             stdNext.s1''           System.Random                            System/Random.hs:524:17-64                            2173      32768    0.0    0.0     0.0    0.0
+             stdNext.s2'            System.Random                            System/Random.hs:527:17-60                            2175      32768    0.0    0.0     0.0    0.0
+             stdNext.s2''           System.Random                            System/Random.hs:528:17-64                            2176      32768    0.0    0.0     0.0    0.0
+             stdNext.z              System.Random                            System/Random.hs:520:17-34                            2170      32768    0.0    0.0     0.0    0.0
+             stdNext.z'             System.Random                            System/Random.hs:519:17-58                            2169      32768    0.0    0.0     0.0    0.0
+          randomIvalInteger.f.g'    System.Random                            System/Random.hs:488:25-39                            2190      32768    0.0    0.0     0.0    0.0
+          randomIvalInteger.f.v'    System.Random                            System/Random.hs:489:25-76                            2156      32768    0.0    0.0     0.0    0.0
+          randomIvalInteger.f.x     System.Random                            System/Random.hs:488:25-39                            2157      32768    0.0    0.0     0.0    0.0
+         randomIvalInteger.k        System.Random                            System/Random.hs:482:8-20                             2151      32768    0.0    0.0     0.0    0.0
+         randomIvalInteger.magtgt   System.Random                            System/Random.hs:483:8-21                             2152      32768    0.0    0.0     0.0    0.0
+     randomR                        System.Random                            System/Random.hs:345:34-61                            2146      32768    0.0    0.0     0.1    0.1
+      randomIvalIntegral            System.Random                            System/Random.hs:462:1-71                             2147      32768    0.1    0.1     0.1    0.1
+   shuffle.\                        Utils                                    src/Utils.hs:23:28-44                                 2214      32767    0.1    0.1     0.2    0.2
+    basicUnsafeRead                 Data.Vector.Mutable                      Data/Vector/Mutable.hs:117:3-59                       2220      65534    0.0    0.0     0.0    0.0
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2221      65534    0.0    0.0     0.0    0.0
+      marray#                       Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2222      65534    0.0    0.0     0.0    0.0
+    basicUnsafeWrite                Data.Vector.Mutable                      Data/Vector/Mutable.hs:120:3-65                       2223      65534    0.0    0.1     0.0    0.1
+     primitive                      Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2224      65534    0.0    0.0     0.0    0.0
+      marray#                       Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2225      65534    0.0    0.0     0.0    0.0
+    unId                            Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2216      65534    0.0    0.0     0.0    0.0
+    basicLength                     Data.Vector                              Data/Vector.hs:284:3-32                               2217      32767    0.0    0.0     0.0    0.0
+    basicUnsafeIndexM               Data.Vector                              Data/Vector.hs:290:3-62                               2218      32767    0.1    0.0     0.1    0.0
+     array#                         Data.Primitive.Array                     Data/Primitive/Array.hs:87:5-10                       2219      32767    0.0    0.0     0.0    0.0
+    basicLength                     Data.Vector.Mutable                      Data/Vector/Mutable.hs:88:3-33                        2215          1    0.0    0.0     0.0    0.0
+   basicUnsafeFreeze                Data.Vector                              Data/Vector.hs:(276,3)-(277,47)                       2196          2    0.0    0.0     0.0    0.0
+    primitive                       Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2226          1    0.0    0.0     0.0    0.0
+     marray#                        Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2227          1    0.0    0.0     0.0    0.0
+    primitive                       Control.Monad.Primitive                  Control/Monad/Primitive.hs:93:3-16                    2197          1    0.0    0.0     0.0    0.0
+     marray#                        Data.Primitive.Array                     Data/Primitive/Array.hs:92:5-11                       2198          1    0.0    0.0     0.0    0.0
+   basicUnsafeNew                   Data.Vector.Mutable                      Data/Vector/Mutable.hs:(101,3)-(104,32)               2133          2    0.0    0.0     0.0    0.0
+    primitive                       Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2211          1    0.0    0.0     0.0    0.0
+    primitive                       Control.Monad.Primitive                  Control/Monad/Primitive.hs:93:3-16                    2134          1    0.0    0.0     0.0    0.0
+   basicLength                      Data.Vector                              Data/Vector.hs:284:3-32                               2210          1    0.0    0.0     0.0    0.0
+   basicUnsafeCopy                  Data.Vector                              Data/Vector.hs:(293,3)-(294,29)                       2212          1    0.0    0.0     0.0    0.0
+    primitive                       Control.Monad.Primitive                  Control/Monad/Primitive.hs:205:3-16                   2213          1    0.0    0.0     0.0    0.0
+   basicUnsafeSlice                 Data.Vector.Mutable                      Data/Vector/Mutable.hs:91:3-62                        2195          1    0.0    0.0     0.0    0.0
+   sElems                           Data.Vector.Fusion.Bundle.Monadic        Data/Vector/Fusion/Bundle/Monadic.hs:121:30-35        2135          1    0.0    0.0     0.0    0.0
+   sSize                            Data.Vector.Fusion.Bundle.Monadic        Data/Vector/Fusion/Bundle/Monadic.hs:124:30-34        2100          1    0.0    0.0     0.0    0.0
+   shuffle.n                        Utils                                    src/Utils.hs:19:8-25                                  2101          1    0.0    0.0     0.0    0.0
+    basicLength                     Data.Vector                              Data/Vector.hs:284:3-32                               2131          1    0.0    0.0     0.0    0.0
+    unId                            Data.Vector.Fusion.Util                  Data/Vector/Fusion/Util.hs:25:21-24                   2102          1    0.0    0.0     0.0    0.0
+   upperBound                       Data.Vector.Fusion.Bundle.Size           Data/Vector/Fusion/Bundle/Size.hs:(126,1)-(128,30)    2099          1    0.0    0.0     0.0    0.0

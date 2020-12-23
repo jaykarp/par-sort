@@ -1,0 +1,26 @@
+-- merge :: (NFData a, Ord a) => V.Vector (V.Vector a) -> (V.Vector a)
+-- merge v = runEval (merge' 0 v)
+--     where
+--     -- merge' :: Int -> V.Vector (V.Vector a) -> Eval (V.Vector a)
+--     merge' l v
+--        | n > 1 = do
+--             a' <- (merge' (l+1) a) >>= rpar
+--             b' <- (merge' (l+1) b) >>= if l > 2 then rpar else rseq
+--             if l < 1 then merge2Par a' b' else return $ merge2 a' b'
+--         | otherwise = return $ v!0
+--         where 
+--         n = V.length v
+--         a = V.slice 0 (n `div` 2) v
+--         b = V.slice (n `div` 2) (n - n `div` 2) v
+-- 
+-- merge :: (NFData a, Ord a) => V.Vector (V.Vector a) -> (V.Vector a)
+-- merge v = mergeAll v 
+--     where
+--         mergeAll x 
+--             | V.length x == 1 = x!0
+--             | otherwise = mergeAll (mergePairs x)
+--         mergePairs x  
+--             | V.length x `mod` 2 == 0 = V.zipWith merge2 (evens x) (odds x) `using` parTraversable rseq
+--             | otherwise = V.zipWith merge2 (evens x) (odds x) `V.snoc` (V.last x) `using` parTraversable rseq
+--         odds = V.ifilter (\i a -> i `mod` 2 == 0)
+--         evens = V.ifilter (\i a -> i `mod` 2 == 1) 
