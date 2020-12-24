@@ -4,6 +4,6 @@ module Lib (
     module Utils,
 ) where
 
-import Sequential
-import Parallel
-import Utils
+import           Parallel
+import           Sequential
+import           Utils

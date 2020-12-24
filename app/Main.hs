@@ -1,45 +1,28 @@
-{-# LANGUAGE DeriveGeneric, TypeOperators #-} 
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TypeOperators #-}
 module Main where
 
-import Lib (
-    readLines,
-    quickSeq,
-    mergeSeq,
-    bitonicSeq,
-    shuffle, 
-    mergePar,
-    bitonicPar,
-    hybridPar,
-    quickPar,
-    time,
-    timeIO )
-import Data.List (sort)
-import qualified Data.Vector as V
-import Data.String ( fromString )
-import System.Environment ( getArgs )
-import System.Console.GetOpt 
-import System.Exit ( die )
-import Control.DeepSeq ( NFData )
--- TODO:
--- parallel or not "-p"
--- Specify which sort we want to run "-s { default, bitonic, quick, merge, hybrid }" (by default this is default (haskell sort))
-    -- Specify bitonic filler "-f "
--- Specify wether we want to time it or not
--- Output or not
--- ints vs file pointer
--- whether or not to use dumb data structure and where to start it from
-
+import           Control.DeepSeq       (NFData)
+import           Data.List             (sort)
+import           Data.String           (fromString)
+import qualified Data.Vector           as V
+import           Lib                   (bitonicPar, bitonicSeq, hybridPar,
+                                        mergePar, mergeSeq, quickPar, quickSeq,
+                                        readLines, shuffle, time, timeIO)
+import           System.Console.GetOpt
+import           System.Environment    (getArgs)
+import           System.Exit           (die)
 
 data Arg
     = Sort String                   -- -s
     | Input String                  -- -i
-    | Size String                   -- -z 
+    | Size String                   -- -z
     | Help                          -- --help
     deriving (Eq, Ord, Show)
 
 options :: [OptDescr Arg]
 options = [
-      Option ['s'] ["sort"] (ReqArg Sort "") "default | bitonicSeq | mergeSeq | quickSeq | bitonicPar | mergePar | quickPar | hybrid"  
+      Option ['s'] ["sort"] (ReqArg Sort "") "default | bitonicSeq | mergeSeq | quickSeq | bitonicPar | mergePar | quickPar | hybrid"
     , Option ['i'] ["input"] (ReqArg Input "") "File path"
     , Option ['z'] ["size"] (ReqArg Size "") "2^z size of array to be sorted"
     , Option ['h'] ["help"] (NoArg Help) "Print this help message"
@@ -47,10 +30,10 @@ options = [
 
 
 runFromArgs :: [String] -> IO ()
-runFromArgs args = case opt of  
-    Help:_ -> die usage 
+runFromArgs args = case opt of
+    Help:_ -> die usage
     (Sort s):(Input f):_ -> do
-        v <- readLines f 
+        v <- readLines f
         if s == "bitonicSeq" || s == "bitonicPar" then
             runBitonic s (fromString "") v
         else
@@ -62,9 +45,9 @@ runFromArgs args = case opt of
             runBitonic s 0 v
         else
             runSort s v
-    _ -> die usage 
-    where 
-    (opt,_,_) = getOpt Permute options args 
+    _ -> die usage
+    where
+    (opt,_,_) = getOpt Permute options args
 
 usage :: String
 usage = "Usage: parsort -s [default | bitonicSeq | mergeSeq | quickSeq | bitonicPar | mergePar | quickPar | hybrid] -i [file] -z [size]"
@@ -76,14 +59,12 @@ runSort "mergeSeq"   v = time "Sequential Merge Sort" (mergeSeq v)
 runSort "hybrid"     v = time "Parallel Hybrid Sort" (hybridPar v)
 runSort "quickPar"   v = time "Parallel Quick Sort" (quickPar v)
 runSort "mergePar"   v = time "Parallel Merge Sort" (mergePar v)
-runSort _ _ = die usage
+runSort _ _            = die usage
 
 runBitonic :: (NFData a, Ord a) => String -> a -> V.Vector a -> IO ()
 runBitonic "bitonicSeq" a v = time "Sequential Bitonic Sort" (bitonicSeq a v)
 runBitonic "bitonicPar" a v = timeIO "Parallel Bitonic Sort" (bitonicPar a v)
-runBitonic _ _ _ = die usage
+runBitonic _ _ _            = die usage
 
 main :: IO ()
-main = getArgs >>= runFromArgs 
-
--- for i in {1..128}; do stack exec -- par-sort-exe +RTS -N8 -lf -ls -A600M -RTS -s default -i res/shuffledwords.txt >> res/default.txt; done;
+main = getArgs >>= runFromArgs
