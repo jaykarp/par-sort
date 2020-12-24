@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE TypeOperators #-}
 module Main where
 
 import           Control.DeepSeq       (NFData)
@@ -53,7 +51,7 @@ usage :: String
 usage = "Usage: parsort -s [default | bitonicSeq | mergeSeq | quickSeq | bitonicPar | mergePar | quickPar | hybrid] -i [file] -z [size]"
 
 runSort :: (NFData a, Ord a) => String -> V.Vector a -> IO ()
-runSort "default"    v = time "Default Sort" (sort $ V.toList $ v)
+runSort "default"    v = time "Default Sort" (sort $ V.toList v)
 runSort "quickSeq"   v = time "Sequential Quicksort" (quickSeq v)
 runSort "mergeSeq"   v = time "Sequential Merge Sort" (mergeSeq v)
 runSort "hybrid"     v = time "Parallel Hybrid Sort" (hybridPar v)

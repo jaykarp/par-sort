@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b3ba355e2ac5aec3d3c578083950f93d988e3bc053b59462517ad5e62627842f
+-- hash: b9097ef2e649bcb8ccd0ed6903e0c43ccad22395049d4ab3e4764f850766e0bb
 
 name:           par-sort
 version:        0.1.0.0
@@ -42,14 +42,11 @@ library
     , monad-par
     , mtl
     , parallel
-    , parallel-io
     , random
-    , repa
     , split
     , time
     , vector
     , vector-split
-    , vector-strategies
   default-language: Haskell2010
 
 executable par-sort-exe
@@ -67,7 +64,6 @@ executable par-sort-exe
     , par-sort
     , parallel
     , random
-    , repa
     , time
     , vector
   default-language: Haskell2010

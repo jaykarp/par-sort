@@ -51,20 +51,20 @@ readLines filename = withFile filename ReadMode ((V.fromList <$>) . getLines)
         else
             (:) <$> B.hGetLine handle <*> getLines handle
 
-newtype Dumb = Dumb (Integer) deriving (Generic, Show)
+newtype Dumb = Dumb Integer deriving (Generic, Show)
 
-instance Eq (Dumb) where
+instance Eq Dumb where
     (Dumb 0) == (Dumb 0) = True
     (Dumb _) == (Dumb 0) = False
     (Dumb 0) == (Dumb _) = False
     (Dumb x) == (Dumb y) = Dumb (x-1) == Dumb (y-1)
 
-instance Ord (Dumb) where
+instance Ord Dumb where
     (Dumb x) <= (Dumb 0) = x <= 0
     (Dumb 0) <= (Dumb y) = y >= 0
-    (Dumb x) <= (Dumb y) = (Dumb (x-1)) <= (Dumb (y-1))
+    (Dumb x) <= (Dumb y) = Dumb (x-1) <= Dumb (y-1)
 
-instance Num (Dumb) where
+instance Num Dumb where
     (+) (Dumb a) (Dumb b) = Dumb $ a + b
     (*) (Dumb a) (Dumb b) = Dumb $ a * b
     abs (Dumb a) = Dumb $ abs a
@@ -72,7 +72,7 @@ instance Num (Dumb) where
     negate (Dumb a) = Dumb $ -a
     signum (Dumb a) = Dumb $ signum a
 
-instance NFData (Dumb)
+instance NFData Dumb
 
 time :: (NFData a) => String -> a -> IO ()
 time msg a = do
@@ -85,5 +85,5 @@ timeIO :: NFData a => [Char] -> IO a -> IO ()
 timeIO msg io = do
     start <- getCurrentTime
     a <- io
-    end <- (force a) `seq` getCurrentTime
+    end <- force a `seq` getCurrentTime
     putStrLn $ msg ++ ": " ++ show (diffUTCTime end start)

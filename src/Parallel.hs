@@ -66,10 +66,10 @@ quickPar x = runEval $ quickPar' chunks
     where
     quickPar' :: (NFData a, Ord a) => [V.Vector a] -> Eval (V.Vector a)
     quickPar' [] = return V.empty
-    quickPar' [v] = rpar (quickSeq $ v)
+    quickPar' [v] = rpar (quickSeq v)
     quickPar' (v:vs) = do
             let p = V.head v
-            vs' <- parList rdeepseq ((V.partition (<p)) <$> ((V.tail v):vs))
+            vs' <- parList rdeepseq (V.partition (<p) <$> (V.tail v:vs))
             lower <- parList rdeepseq (fst <$> vs')
             upper <- parList rdeepseq (snd <$> vs')
             lower' <- parList rdeepseq (filter (not . null) $ V.concat <$> chunksOf 2 lower)
@@ -109,13 +109,13 @@ runs x = V.create $ do
                 runs' (i+1) x (k+1) o
 
 
-merge :: (NFData a, Ord a) => V.Vector (V.Vector a) -> (V.Vector a)
+merge :: (NFData a, Ord a) => V.Vector (V.Vector a) -> V.Vector a
 merge x = runEval (merge' (0::Integer) x)
     where
     merge' l v
        | n > 1 = do
-            a' <- (merge' (l+1) a) >>= if l < 15 then rpar else rseq
-            b' <- (merge' (l+1) b) >>= if l < 15 then rpar else rseq
+            a' <- merge' (l+1) a >>= if l < 15 then rpar else rseq
+            b' <- merge' (l+1) b >>= if l < 15 then rpar else rseq
             if l < 1 then merge2Par a' b' else return $ merge2 a' b'
         | otherwise = return $ v!0
         where
