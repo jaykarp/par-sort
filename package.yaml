@@ -30,14 +30,11 @@ library:
     - deepseq
     - monad-par
     - parallel
-    - parallel-io
     - mtl
     - random
     - abstract-par
     - vector-split
     - split
-    - vector-strategies
-    - repa
     - time
 
 executables:
@@ -59,7 +56,6 @@ executables:
       - monad-par
       - parallel
       - random 
-      - repa
 
 tests:
   par-sort-test:
